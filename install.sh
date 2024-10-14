@@ -58,14 +58,13 @@ server_ip=$(curl -s http://checkip.amazonaws.com)
 # درخواست پورت سفارشی از کاربر
 echo "Requesting port number from user..."
 read -p "Please enter the port number to run the panel (default: 8080): " port
-echo "Port entered: $port"
 port=${port:-8080}
-
+echo "Port entered: $port"
 
 # تنظیمات Nginx
 echo "Configuring Nginx..."
 sudo rm -f /etc/nginx/sites-enabled/ssr-panel  # حذف سیم‌لینک قدیمی اگر وجود دارد
-cat <<EOL > /etc/nginx/sites-available/ssr-panel
+cat <<EOL | sudo tee /etc/nginx/sites-available/ssr-panel > /dev/null
 server {
     listen $port;
     server_name $server_ip;
@@ -90,6 +89,7 @@ EOL
 sudo ln -sf /etc/nginx/sites-available/ssr-panel /etc/nginx/sites-enabled/
 
 # راه‌اندازی مجدد Nginx
+echo "Restarting Nginx..."
 sudo systemctl restart nginx
 
 # ساخت دیتابیس
