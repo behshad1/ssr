@@ -1,0 +1,64 @@
+<?php
+
+// اتصال به دیتابیس با استفاده از PDO
+try {
+    $db = new PDO('mysql:host=localhost;dbname=ssrdatabase', 'ssrdatabase', '8sSdmjPi3J3aDSBG');
+    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Database connection failed: " . $e->getMessage());
+}
+
+// تابع برای پاک کردن کدهای ANSI
+function stripAnsiCodes($text) {
+    return preg_replace('/\x1B\[[0-?]*[ -\/]*[@-~]/', '', $text);
+}
+
+// تابع برای به‌روزرسانی اطلاعات ترافیک کاربران
+function updateUsersTraffic($db) {
+    // اجرای دستور برای دریافت اطلاعات کاربران
+    $command = 'printf "5\n" | sudo -S /usr/local/bin/ssrrmu.sh';
+    $output = shell_exec($command . ' 2>&1');
+
+    // بررسی اینکه آیا دستور اجرا شده است یا خیر
+    if ($output === null) {
+        error_log("Command failed to execute");
+        return "Failed to retrieve user list.";
+    }
+
+    // پاک کردن خروجی از کدهای ANSI
+    $cleanOutput = stripAnsiCodes($output);
+
+    // پردازش خروجی برای استخراج اطلاعات کاربران
+    $lines = explode("\n", $cleanOutput);
+
+    foreach ($lines as $line) {
+        if (strpos($line, 'Username:') !== false) {
+            preg_match('/Username: (.*?) Port: (\d+) Traffic usage \(used \+ remaining = total\): (.*?) \+ (.*?) = (.*)/', $line, $matches);
+            if (count($matches) == 6) {
+                $username = $matches[1];
+                $port = $matches[2];
+                $usedTraffic = $matches[3];
+                $remainingTraffic = $matches[4];
+                $totalTraffic = $matches[5];
+
+                // به‌روزرسانی اطلاعات در دیتابیس
+                $stmt = $db->prepare("UPDATE users SET used_traffic = :usedTraffic, remaining_traffic = :remainingTraffic, total_traffic = :totalTraffic WHERE port = :port");
+                $stmt->bindParam(':usedTraffic', $usedTraffic);
+                $stmt->bindParam(':remainingTraffic', $remainingTraffic);
+                $stmt->bindParam(':totalTraffic', $totalTraffic);
+                $stmt->bindParam(':port', $port);
+
+                if ($stmt->execute()) {
+                    echo "Updated user: $username (Port: $port)\n";
+                } else {
+                    error_log("Failed to update user: $username (Port: $port)");
+                }
+            }
+        }
+    }
+}
+
+// اجرای به‌روزرسانی
+updateUsersTraffic($db);
+
+?>
