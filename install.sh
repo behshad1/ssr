@@ -38,7 +38,7 @@ echo "Installing dependencies..."
 sudo apt update
 sudo apt install -y php7.4 php7.4-fpm php7.4-mysql nginx git mysql-server
 
-# بررسی نصب صحیح MySQL
+# بررسی نصب MySQL
 if ! command -v mysql &> /dev/null; then
     echo "Error: MySQL installation failed or MySQL is not installed correctly."
     exit 1
@@ -57,7 +57,7 @@ server_ip=$(curl -s http://checkip.amazonaws.com)
 
 # درخواست پورت سفارشی از کاربر
 read -p "Please enter the port number to run the panel (default: 8080): " port
-port=${port:-8080}  # اگر ورودی خالی بود، پیش‌فرض 8080 استفاده می‌شود
+port=${port:-8080}
 
 # تنظیمات Nginx
 echo "Configuring Nginx..."
@@ -83,7 +83,7 @@ server {
 }
 EOL
 
-# ایجاد لینک از فایل تنظیمات در sites-available به sites-enabled
+# ایجاد لینک سیم‌لینک
 sudo ln -sf /etc/nginx/sites-available/ssr-panel /etc/nginx/sites-enabled/
 
 # راه‌اندازی مجدد Nginx
@@ -91,8 +91,8 @@ sudo systemctl restart nginx
 
 # ساخت دیتابیس
 echo "Setting up the database..."
-sudo mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS ssrdatabase;"
-sudo mysql -u root -p -e "SOURCE /var/www/ssr-admin-panel/sql/ssr_database.sql;"
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS ssrdatabase;"
+mysql -u root -p -e "SOURCE /var/www/ssr-admin-panel/sql/ssr_database.sql;"
 
 # تنظیم کرون‌جاب برای به‌روزرسانی ترافیک
 echo "Setting up the cron job..."
