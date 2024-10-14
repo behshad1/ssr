@@ -97,6 +97,18 @@ echo "Setting up the database..."
 mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS ssrdatabase;"
 mysql -u root -p -e "SOURCE /var/www/ssr-admin-panel/sql/ssr_database.sql;"
 
+# درخواست نام کاربری و رمز عبور برای پنل
+echo "Creating admin user for the panel..."
+read -p "Enter username for the admin: " admin_user
+read -sp "Enter password for the admin: " admin_pass
+echo
+
+# هش کردن رمز عبور
+hashed_pass=$(php -r "echo password_hash('$admin_pass', PASSWORD_DEFAULT);")
+
+# اضافه کردن کاربر به دیتابیس
+mysql -u root -p -e "INSERT INTO ssrdatabase.users (username, password) VALUES ('$admin_user', '$hashed_pass');"
+
 # تنظیم کرون‌جاب برای به‌روزرسانی ترافیک
 echo "Setting up the cron job..."
 (crontab -l ; echo "* * * * * /usr/bin/php /var/www/ssr-admin-panel/update_users_traffic.php") | crontab -
