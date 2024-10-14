@@ -56,8 +56,11 @@ sudo chown -R www-data:www-data /var/www/ssr-admin-panel
 server_ip=$(curl -s http://checkip.amazonaws.com)
 
 # درخواست پورت سفارشی از کاربر
+echo "Requesting port number from user..."
 read -p "Please enter the port number to run the panel (default: 8080): " port
+echo "Port entered: $port"
 port=${port:-8080}
+
 
 # تنظیمات Nginx
 echo "Configuring Nginx..."
