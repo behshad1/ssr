@@ -38,6 +38,12 @@ echo "Installing dependencies..."
 sudo apt update
 sudo apt install -y php7.4 php7.4-fpm php7.4-mysql nginx git mysql-server
 
+# بررسی نصب صحیح MySQL
+if ! command -v mysql &> /dev/null; then
+    echo "Error: MySQL installation failed or MySQL is not installed correctly."
+    exit 1
+fi
+
 # کلون کردن پروژه از گیت‌هاب
 echo "Cloning the project from GitHub..."
 git clone https://github.com/behshad1/ssr.git /var/www/ssr-admin-panel
@@ -55,6 +61,7 @@ port=${port:-8080}  # اگر ورودی خالی بود، پیش‌فرض 8080 �
 
 # تنظیمات Nginx
 echo "Configuring Nginx..."
+sudo rm -f /etc/nginx/sites-enabled/ssr-panel  # حذف سیم‌لینک قدیمی اگر وجود دارد
 cat <<EOL > /etc/nginx/sites-available/ssr-panel
 server {
     listen $port;
