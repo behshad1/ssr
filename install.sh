@@ -84,7 +84,8 @@ sudo systemctl restart nginx
 
 # ساخت دیتابیس
 echo "Setting up the database..."
-mysql -u root -p -e "SOURCE /var/www/ssr-admin-panel/sql/ssr_database.sql;"
+sudo mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS ssrdatabase;"
+sudo mysql -u root -p -e "SOURCE /var/www/ssr-admin-panel/sql/ssr_database.sql;"
 
 # تنظیم کرون‌جاب برای به‌روزرسانی ترافیک
 echo "Setting up the cron job..."
