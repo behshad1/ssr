@@ -21,6 +21,11 @@ $addUserPage = false;
 $deleteUserPage = false; // اضافه کردن متغیر برای صفحه حذف کاربر
 $getDatabaseUsersMessage = '';
 
+
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+    header('Location: login.php');
+    exit;
+}
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['username']) && isset($_POST['port']) && isset($_POST['traffic'])) {
         // گرفتن ورودی‌های فرم
