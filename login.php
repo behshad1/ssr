@@ -1,50 +1,53 @@
 <?php
 session_start();
-include('db.php');
+include 'includes/db.php'; // برای اتصال به دیتابیس
 
-// چک کردن اگر کاربر وارد شده است
-if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
-    header('Location: admin_panel.php');
-    exit;
-}
-
-// پردازش فرم لاگین
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+// بررسی ارسال فرم
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    // بررسی نام کاربری و رمز عبور
-    if ($username === 'admin' && $password === 'password123') {
-        $_SESSION['logged_in'] = true;
+    // بررسی نام کاربری در دیتابیس
+    $stmt = $pdo->prepare('SELECT * FROM users WHERE username = ?');
+    $stmt->execute([$username]);
+    $user = $stmt->fetch();
+
+    if ($user && password_verify($password, $user['password'])) {
+        // ذخیره اطلاعات کاربر در session
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['username'] = $user['username'];
+
+        // هدایت به پنل مدیریت
         header('Location: admin_panel.php');
         exit;
     } else {
-        $error = "Invalid username or password.";
+        $error = 'نام کاربری یا رمز عبور اشتباه است.';
     }
 }
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fa">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>ورود به پنل مدیریت</title>
 </head>
 <body>
-    <h2>Login</h2>
-    <form method="post">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required><br>
-
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required><br>
-
-        <input type="submit" value="Login">
-    </form>
+    <h2>ورود به پنل مدیریت</h2>
 
     <?php if (isset($error)): ?>
         <p style="color: red;"><?php echo $error; ?></p>
     <?php endif; ?>
+
+    <form method="POST" action="login.php">
+        <label for="username">نام کاربری:</label>
+        <input type="text" id="username" name="username" required>
+
+        <label for="password">رمز عبور:</label>
+        <input type="password" id="password" name="password" required>
+
+        <button type="submit">ورود</button>
+    </form>
 </body>
 </html>
