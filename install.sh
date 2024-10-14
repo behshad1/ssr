@@ -16,12 +16,16 @@ sudo chown -R www-data:www-data /var/www/ssr-admin-panel
 # گرفتن آی‌پی سرور
 server_ip=$(curl -s http://checkip.amazonaws.com)
 
+# درخواست پورت سفارشی از کاربر
+read -p "Please enter the port number to run the panel (default: 8080): " port
+port=${port:-8080}  # اگر ورودی خالی بود، پیش‌فرض 8080 استفاده می‌شود
+
 # تنظیمات Nginx
 echo "Configuring Nginx..."
 cat <<EOL > /etc/nginx/sites-available/ssr-panel
 server {
-    listen 80;
-    server_name $server_ip;  # آی‌پی سرور خودکار جایگزین می‌شود
+    listen $port;
+    server_name $server_ip;
     root /var/www/ssr-admin-panel;
 
     index admin_panel.php index.php index.html;
@@ -54,4 +58,4 @@ echo "Setting up the cron job..."
 (crontab -l ; echo "* * * * * /usr/bin/php /var/www/ssr-admin-panel/update_users_traffic.php") | crontab -
 
 # پیام پایانی نصب
-echo "Installation completed. Please visit http://$server_ip to access the panel."
+echo "Installation completed. Please visit http://$server_ip:$port to access the panel."
