@@ -6,6 +6,6 @@ if (!file_exists('includes/db.php')) {
 }
 
 // هدایت به صفحه مدیریت
-header('Location: templates/admin_panel.php');
+header('Location: admin_panel.php');
 exit;
 ?>
