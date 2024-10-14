@@ -58,7 +58,7 @@ server_ip=$(curl -s http://checkip.amazonaws.com)
 # درخواست پورت سفارشی از کاربر
 echo "Requesting port number from user..."
 read -p "Please enter the port number to run the panel (default: 8080): " port
-port=${port:-8080}
+port=${port:-8080}  # اگر کاربر چیزی وارد نکرد، پورت پیش‌فرض 8080 خواهد بود
 echo "Port entered: $port"
 
 # تنظیمات Nginx
