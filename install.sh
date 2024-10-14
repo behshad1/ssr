@@ -1,5 +1,38 @@
 #!/bin/bash
 
+# تابعی برای حذف کامل پروژه
+uninstall() {
+    echo "Uninstalling SSR Admin Panel..."
+    sudo rm -rf /var/www/ssr-admin-panel
+    sudo rm /etc/nginx/sites-available/ssr-panel
+    sudo rm /etc/nginx/sites-enabled/ssr-panel
+    sudo systemctl restart nginx
+    echo "Uninstallation completed."
+}
+
+# بررسی وجود دایرکتوری پروژه
+if [ -d "/var/www/ssr-admin-panel" ]; then
+    echo "The SSR Admin Panel already exists. What do you want to do?"
+    echo "1) Uninstall and Reinstall"
+    echo "2) Cancel"
+    
+    read -p "Please enter your choice [1-2]: " choice
+
+    case $choice in
+        1)
+            uninstall
+            ;;
+        2)
+            echo "Installation canceled."
+            exit 0
+            ;;
+        *)
+            echo "Invalid choice. Installation canceled."
+            exit 1
+            ;;
+    esac
+fi
+
 # نصب پیش‌نیازها
 echo "Installing dependencies..."
 sudo apt update
