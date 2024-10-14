@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# تابعی برای حذف کامل پروژه
+# تابع حذف کامل پروژه و تنظیمات قبلی
 uninstall() {
     echo "Uninstalling SSR Admin Panel..."
     sudo rm -rf /var/www/ssr-admin-panel
