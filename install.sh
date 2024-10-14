@@ -4,8 +4,8 @@
 uninstall() {
     echo "Uninstalling SSR Admin Panel..."
     sudo rm -rf /var/www/ssr-admin-panel
-    sudo rm /etc/nginx/sites-available/ssr-panel
-    sudo rm /etc/nginx/sites-enabled/ssr-panel
+    sudo rm -f /etc/nginx/sites-available/ssr-panel
+    sudo rm -f /etc/nginx/sites-enabled/ssr-panel
     sudo systemctl restart nginx
     echo "Uninstallation completed."
 }
@@ -36,7 +36,7 @@ fi
 # نصب پیش‌نیازها
 echo "Installing dependencies..."
 sudo apt update
-sudo apt install -y php7.4 php7.4-fpm php7.4-mysql nginx git
+sudo apt install -y php7.4 php7.4-fpm php7.4-mysql nginx git mysql-server
 
 # کلون کردن پروژه از گیت‌هاب
 echo "Cloning the project from GitHub..."
@@ -77,7 +77,7 @@ server {
 EOL
 
 # ایجاد لینک از فایل تنظیمات در sites-available به sites-enabled
-sudo ln -s /etc/nginx/sites-available/ssr-panel /etc/nginx/sites-enabled/
+sudo ln -sf /etc/nginx/sites-available/ssr-panel /etc/nginx/sites-enabled/
 
 # راه‌اندازی مجدد Nginx
 sudo systemctl restart nginx
