@@ -3,6 +3,14 @@
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
+
+session_start();
+
+// بررسی ورود کاربر
+if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php');
+    exit;
+}
 include('../templates/header.php');
 include('../templates/footer.php');
 
