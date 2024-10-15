@@ -7,8 +7,8 @@ error_reporting(E_ALL);
 session_start();
 
 
-include('../templates/header.php');
-include('../templates/footer.php');
+//include('../templates/header.php');
+//include('../templates/footer.php');
 
 require_once 'functions.php'; // فایل جداگانه برای توابع
 
