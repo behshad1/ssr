@@ -283,3 +283,19 @@ function getUsersFromDatabase() {
 
     return $userList;
 }
+
+// تابع بررسی اعتبار کاربر
+function checkUserCredentials($username, $password) {
+    // در اینجا اعتبارسنجی ساده انجام می‌شود. در واقعیت، باید از یک دیتابیس برای بررسی نام کاربری و رمز عبور استفاده شود.
+    
+    // نام کاربری و رمز عبور صحیح
+    $validUsername = 'admin';
+    $validPassword = 'password123'; // رمز عبور باید به صورت هش‌شده در دیتابیس ذخیره شود
+
+    // بررسی تطابق نام کاربری و رمز عبور
+    if ($username === $validUsername && $password === $validPassword) {
+        return true;
+    } else {
+        return false;
+    }
+}
