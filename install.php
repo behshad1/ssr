@@ -9,11 +9,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // تلاش برای اتصال به دیتابیس
     try {
+        // اتصال به سرور MySQL
         $pdo = new PDO("mysql:host=$host", $dbuser, $dbpass);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         // ایجاد دیتابیس اگر وجود ندارد
-        $pdo->exec("CREATE DATABASE IF NOT EXISTS `$dbname`; USE `$dbname`;");
+        $pdo->exec("CREATE DATABASE IF NOT EXISTS `$dbname`;");
+        // انتخاب دیتابیس
+        $pdo->exec("USE `$dbname`;");
 
         // ایجاد جدول کاربران
         $pdo->exec("CREATE TABLE IF NOT EXISTS users (
