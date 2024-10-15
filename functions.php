@@ -286,16 +286,31 @@ function getUsersFromDatabase() {
 
 // تابع بررسی اعتبار کاربر
 function checkUserCredentials($username, $password) {
-    // در اینجا اعتبارسنجی ساده انجام می‌شود. در واقعیت، باید از یک دیتابیس برای بررسی نام کاربری و رمز عبور استفاده شود.
-    
-    // نام کاربری و رمز عبور صحیح
-    $validUsername = 'admin';
-    $validPassword = 'password123'; // رمز عبور باید به صورت هش‌شده در دیتابیس ذخیره شود
+    // اتصال به دیتابیس
+    $conn = new mysqli('localhost', 'root', 'your_root_password', 'ssrdatabase');
 
-    // بررسی تطابق نام کاربری و رمز عبور
-    if ($username === $validUsername && $password === $validPassword) {
-        return true;
-    } else {
-        return false;
+    // بررسی اتصال
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
     }
+
+    // کوئری برای دریافت اطلاعات کاربر
+    $stmt = $conn->prepare("SELECT password FROM users WHERE username = ?");
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $stmt->store_result();
+
+    // اگر کاربر وجود دارد
+    if ($stmt->num_rows > 0) {
+        $stmt->bind_result($hashed_password);
+        $stmt->fetch();
+
+        // بررسی رمز عبور
+        if (password_verify($password, $hashed_password)) {
+            return true;
+        }
+    }
+
+    // در غیر این صورت، نام کاربری یا رمز عبور اشتباه است
+    return false;
 }
