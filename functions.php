@@ -283,9 +283,7 @@ function getUsersFromDatabase() {
 
     return $userList;
 }
-// تابع بررسی اعتبار کاربر
 function checkUserCredentials($username, $password) {
-    // اتصال به دیتابیس
     $conn = new mysqli('localhost', 'root', 'your_root_password', 'ssrdatabase');
 
     // بررسی اتصال
@@ -306,11 +304,25 @@ function checkUserCredentials($username, $password) {
 
         // بررسی رمز عبور
         if (password_verify($password, $hashed_password)) {
-            return true;
+            // اگر اعتبار صحیح بود، به admin_panel.php هدایت می‌شود
+            header("Location: admin_panel.php");
+            exit();
+        } else {
+            echo "نام کاربری یا رمز عبور اشتباه است.";
         }
+    } else {
+        echo "نام کاربری یا رمز عبور اشتباه است.";
     }
 
-    // در غیر این صورت، نام کاربری یا رمز عبور اشتباه است
-    return false;
+    // بستن اتصال
+    $stmt->close();
+    $conn->close();
 }
 
+// استفاده از تابع
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+
+    checkUserCredentials($username, $password);
+}
