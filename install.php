@@ -1,70 +1,64 @@
 <?php
-// بررسی اینکه آیا فرم ارسال شده است
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // دریافت اطلاعات دیتابیس از فرم
-    $db_host = $_POST['db_host'];
-    $db_name = $_POST['db_name'];
-    $db_user = $_POST['db_user'];
-    $db_pass = $_POST['db_pass'];
+// نمایش خطاها برای دیباگ
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-    try {
-        // اتصال به دیتابیس
-        $db = new PDO('mysql:host=' . $db_host, $db_user, $db_pass);
-        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+// اطلاعات دیتابیس اصلی MySQL برای ساخت دیتابیس و یوزر جدید
+$rootUser = 'root'; // این یوزر باید دسترسی ادمین داشته باشد
+$rootPass = ''; // پسورد روت MySQL را اینجا وارد کنید یا بگذارید خالی بماند در صورت استفاده بدون پسورد
 
-        // ایجاد دیتابیس
-        $db->exec("CREATE DATABASE IF NOT EXISTS `$db_name`");
-        $db->exec("USE `$db_name`");
+// نام دیتابیس و یوزر جدیدی که می‌خواهید بسازید
+$dbName = 'ssrdatabase';
+$dbUser = 'ssruser'; // نام کاربری یوزر جدید
+$dbPass = 'password123'; // پسورد برای یوزر جدید
 
-        // ایجاد جداول
-        $sql = "
-        CREATE TABLE IF NOT EXISTS `users` (
-            `id` INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-            `username` VARCHAR(100) NOT NULL,
-            `port` INT(5) NOT NULL,
-            `traffic` VARCHAR(100) NOT NULL,
-            `used_traffic` VARCHAR(100) DEFAULT '0',
-            `remaining_traffic` VARCHAR(100) DEFAULT '0',
-            `total_traffic` VARCHAR(100) DEFAULT '0',
-            `ssr_link` TEXT,
-            `converted_link` TEXT,
-            `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        );
-        ";
+try {
+    // اتصال به MySQL به عنوان root
+    $pdo = new PDO('mysql:host=localhost', $rootUser, $rootPass);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        $db->exec($sql);
-        echo "Database and tables created successfully!";
+    // ایجاد دیتابیس
+    $pdo->exec("CREATE DATABASE IF NOT EXISTS `$dbName`");
+    echo "Database '$dbName' created successfully.<br>";
 
-        // نوشتن اطلاعات دیتابیس در فایل config.php
-        $config_content = "<?php\n";
-        $config_content .= "define('DB_HOST', '$db_host');\n";
-        $config_content .= "define('DB_NAME', '$db_name');\n";
-        $config_content .= "define('DB_USER', '$db_user');\n";
-        $config_content .= "define('DB_PASS', '$db_pass');\n";
+    // ساخت یوزر جدید و دادن دسترسی به دیتابیس
+    $pdo->exec("CREATE USER IF NOT EXISTS '$dbUser'@'localhost' IDENTIFIED BY '$dbPass'");
+    $pdo->exec("GRANT ALL PRIVILEGES ON `$dbName`.* TO '$dbUser'@'localhost'");
+    $pdo->exec("FLUSH PRIVILEGES");
+    echo "User '$dbUser' created and granted privileges.<br>";
 
-        file_put_contents('config.php', $config_content);
-        echo "Configuration file created successfully!";
-    } catch (PDOException $e) {
-        echo "Error: " . $e->getMessage();
-    }
-} else {
-    // نمایش فرم برای دریافت اطلاعات دیتابیس
-    ?>
-    <form method="post">
-        <label for="db_host">Database Host:</label>
-        <input type="text" name="db_host" value="localhost" required><br>
+    // انتخاب دیتابیس
+    $pdo->exec("USE `$dbName`");
 
-        <label for="db_name">Database Name:</label>
-        <input type="text" name="db_name" required><br>
+    // ایجاد جداول مورد نیاز
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS users (
+            id INT(11) AUTO_INCREMENT PRIMARY KEY,
+            username VARCHAR(50) NOT NULL,
+            port INT(5) NOT NULL,
+            traffic BIGINT DEFAULT 0,
+            used_traffic BIGINT DEFAULT 0,
+            remaining_traffic BIGINT DEFAULT 0,
+            total_traffic BIGINT DEFAULT 0,
+            ssr_link TEXT,
+            converted_link TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ");
+    echo "Table 'users' created successfully.<br>";
 
-        <label for="db_user">Database User:</label>
-        <input type="text" name="db_user" required><br>
+    // ساخت فایل config.php و ذخیره اطلاعات اتصال به دیتابیس
+    $configContent = "<?php\n";
+    $configContent .= "define('DB_HOST', 'localhost');\n";
+    $configContent .= "define('DB_NAME', '$dbName');\n";
+    $configContent .= "define('DB_USER', '$dbUser');\n";
+    $configContent .= "define('DB_PASS', '$dbPass');\n";
+    
+    file_put_contents('config.php', $configContent);
+    echo "Config file created successfully.<br>";
 
-        <label for="db_pass">Database Password:</label>
-        <input type="password" name="db_pass" required><br>
-
-        <input type="submit" value="Install">
-    </form>
-    <?php
+} catch (PDOException $e) {
+    die("Error: " . $e->getMessage());
 }
 ?>
