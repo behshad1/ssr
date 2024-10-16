@@ -36,7 +36,10 @@ fi
 # نصب پیش‌نیازها
 echo "Installing dependencies..."
 sudo apt update
-sudo apt install -y php7.4 php7.4-fpm php7.4-mysql nginx git mysql-server
+sudo apt install -y software-properties-common
+sudo add-apt-repository ppa:ondrej/php -y
+sudo apt update
+sudo apt install -y php8.1 php8.1-fpm php8.1-mysql nginx git mysql-server
 
 # بررسی نصب MySQL
 if ! command -v mysql &> /dev/null; then
@@ -54,12 +57,12 @@ sudo chown -R www-data:www-data /var/www/ssr-admin-panel
 
 # تنظیم user و group برای PHP
 echo "Configuring PHP user and group..."
-sudo sed -i "s/^user = .*/user = www-data/" /etc/php/7.4/fpm/pool.d/www.conf
-sudo sed -i "s/^group = .*/group = www-data/" /etc/php/7.4/fpm/pool.d/www.conf
+sudo sed -i "s/^user = .*/user = www-data/" /etc/php/8.1/fpm/pool.d/www.conf
+sudo sed -i "s/^group = .*/group = www-data/" /etc/php/8.1/fpm/pool.d/www.conf
 
 # غیرفعال کردن توابع exec, passthru, system
 echo "Modifying PHP configuration..."
-sudo sed -i "s/^disable_functions = .*/disable_functions = exec,passthru,system,/" /etc/php/7.4/fpm/php.ini
+sudo sed -i "s/^disable_functions = .*/disable_functions = exec,passthru,system,/" /etc/php/8.1/fpm/php.ini
 
 # گرفتن آی‌پی سرور
 server_ip=$(curl -s http://checkip.amazonaws.com)
@@ -87,7 +90,7 @@ server {
 
     location ~ \.php\$ {
         include snippets/fastcgi-php.conf;
-        fastcgi_pass unix:/var/run/php/php7.4-fpm.sock;
+        fastcgi_pass unix:/var/run/php/php8.1-fpm.sock;
         fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
         include fastcgi_params;
     }
