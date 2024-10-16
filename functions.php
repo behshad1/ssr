@@ -147,7 +147,7 @@ function addUser($username, $port, $traffic) {
     $traffic = trim($traffic);
 
     // تنظیم دستور برای اجرای اسکریپت با استفاده از echo -e
-    $command = 'echo -e "7\n1\n' 
+    $command = 'printf "7\n1\n' 
                . $username . '\n' 
                . $port . '\n\n'  // پسورد خالی
                . '7\n5\n2\n\n10\n\n\n'  // ادامه مراحل
