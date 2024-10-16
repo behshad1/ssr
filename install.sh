@@ -121,20 +121,7 @@ hashed_pass=$(php -r "echo password_hash('$admin_pass', PASSWORD_DEFAULT);")
 # اضافه کردن کاربر به دیتابیس
 mysql -u root -p -e "INSERT INTO ssrdatabase.users (username, password) VALUES ('$admin_user', '$hashed_pass');"
 
-# تنظیمات فایل config.php
-echo "Setting up config.php..."
-cat <<EOL | sudo tee /var/www/ssr-admin-panel/config.php > /dev/null
-<?php
-// اطلاعات اتصال به دیتابیس
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'ssrdatabase');
-define('DB_USER', '$admin_user');
-define('DB_PASS', '$admin_pass');
 
-// سایر تنظیمات عمومی
-define('PANEL_TITLE', 'ShadowsocksR Admin Panel');
-?>
-EOL
 
 # تنظیم کرون‌جاب برای به‌روزرسانی ترافیک
 echo "Setting up the cron job..."
