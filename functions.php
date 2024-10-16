@@ -1,4 +1,5 @@
 <?php
+require_once 'config.php';
 
 // تابع برای پاک کردن کدهای ANSI
 function stripAnsiCodes($text) {
@@ -150,7 +151,7 @@ function addUser($username, $port, $traffic) {
                . $username . '\n' 
                . $port . '\n\n'  // پسورد خالی
                . '7\n5\n2\n\n10\n\n\n'  // ادامه مراحل
-               . $traffic . '\n\nn\n" | sudo -S /usr/local/bin/ssrrmu.sh';
+               . $traffic . '\n\nn\n" | sudo /usr/local/bin/ssrrmu.sh';
 
     // ثبت دستور در لاگ برای دیباگ
     error_log("Executing Add User command: " . $command);
@@ -186,7 +187,7 @@ function addUser($username, $port, $traffic) {
         }
 
         // حالا اطلاعات کاربر و لینک را به دیتابیس اضافه می‌کنیم
-   try {
+       try {
     // اتصال به دیتابیس با استفاده از اطلاعات از config.php
             $db = new PDO('mysql:host=' . DB_HOST . ';dbname=' . DB_NAME, DB_USER, DB_PASS);
             $stmt = $db->prepare("INSERT INTO users (username, port, traffic, ssr_link, converted_link) VALUES (:username, :port, :traffic, :ssr_link, :converted_link)");
@@ -245,7 +246,8 @@ function deleteUser($port) {
     // بررسی موفقیت‌آمیز بودن حذف از سیستم
     if (strpos($output, '[information] 用户删除成功') !== false) {
         // در صورتی که حذف موفقیت‌آمیز باشد، کاربر را از دیتابیس حذف می‌کنیم
-        $db = new PDO('mysql:host=localhost;dbname=ssrdatabase', 'ssrdatabase', '8sSdmjPi3J3aDSBG');
+ 
+            $db = new PDO('mysql:host=' . DB_HOST . ';dbname=' . DB_NAME, DB_USER, DB_PASS);
 
         // اجرای کوئری حذف
         $query = "DELETE FROM users WHERE port = $port";
@@ -264,7 +266,7 @@ function deleteUser($port) {
 
 
 function getUsersFromDatabase() {
-    $db = new PDO('mysql:host=localhost;dbname=ssrdatabase', 'ssrdatabase', '8sSdmjPi3J3aDSBG');
+    $db = new PDO('mysql:host=' . DB_HOST . ';dbname=' . DB_NAME, DB_USER, DB_PASS);
     $query = "SELECT * FROM users";
     $stmt = $db->query($query);
     $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -284,3 +286,39 @@ function getUsersFromDatabase() {
 
     return $userList;
 }
+
+function install_SSR() {
+    // دستور نصب اسکریپت (گزینه 1 به صورت دیفالت انتخاب می‌شود)
+    $command = 'printf "1\n" | sudo -S /usr/local/bin/ssrrmu.sh';
+    error_log("Executing Install command: " . $command);
+
+    // اجرای دستور نصب
+    $output = shell_exec($command . ' 2>&1');
+
+    if ($output === null) {
+        error_log("Command failed to execute during install");
+        return "Installation failed.";
+    } else {
+        error_log("Install output: " . $output);
+    }
+
+    return "Installation completed successfully.\n$output";
+}
+function uninstall_SSR() {
+    // دستور حذف اسکریپت (گزینه 3 برای حذف انتخاب می‌شود)
+    $command = 'printf "3\ny" | sudo -S /usr/local/bin/ssrrmu.sh';
+    error_log("Executing Uninstall command: " . $command);
+
+    // اجرای دستور حذف
+    $output = shell_exec($command . ' 2>&1');
+
+    if ($output === null) {
+        error_log("Command failed to execute during uninstall");
+        return "Uninstallation failed.";
+    } else {
+        error_log("Uninstall output: " . $output);
+    }
+
+    return "Uninstallation completed successfully.\n$output";
+}
+
