@@ -227,7 +227,7 @@ function deleteUser($port) {
     }
 
     // تنظیم دستور برای حذف کاربر از سیستم
-    $command = 'echo -e "7\n2\n' . $port . '\nn" | sudo -S /usr/local/bin/ssrrmu.sh';
+    $command = 'printf "7\n2\n' . $port . '\nn" | sudo -S /usr/local/bin/ssrrmu.sh';
     
     // ثبت دستور در لاگ برای دیباگ
     error_log("Executing Delete User command: " . $command);
