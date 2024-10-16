@@ -52,6 +52,15 @@ git clone https://github.com/behshad1/ssr.git /var/www/ssr-admin-panel
 echo "Setting up permissions..."
 sudo chown -R www-data:www-data /var/www/ssr-admin-panel
 
+# تنظیم user و group برای PHP
+echo "Configuring PHP user and group..."
+sudo sed -i "s/^user = .*/user = www-data/" /etc/php/7.4/fpm/pool.d/www.conf
+sudo sed -i "s/^group = .*/group = www-data/" /etc/php/7.4/fpm/pool.d/www.conf
+
+# غیرفعال کردن توابع exec, passthru, system
+echo "Modifying PHP configuration..."
+sudo sed -i "s/^disable_functions = .*/disable_functions = exec,passthru,system,/" /etc/php/7.4/fpm/php.ini
+
 # گرفتن آی‌پی سرور
 server_ip=$(curl -s http://checkip.amazonaws.com)
 
@@ -109,9 +118,28 @@ hashed_pass=$(php -r "echo password_hash('$admin_pass', PASSWORD_DEFAULT);")
 # اضافه کردن کاربر به دیتابیس
 mysql -u root -p -e "INSERT INTO ssrdatabase.users (username, password) VALUES ('$admin_user', '$hashed_pass');"
 
+# تنظیمات فایل config.php
+echo "Setting up config.php..."
+cat <<EOL | sudo tee /var/www/ssr-admin-panel/config.php > /dev/null
+<?php
+// اطلاعات اتصال به دیتابیس
+define('DB_HOST', 'localhost');
+define('DB_NAME', 'ssrdatabase');
+define('DB_USER', '$admin_user');
+define('DB_PASS', '$admin_pass');
+
+// سایر تنظیمات عمومی
+define('PANEL_TITLE', 'ShadowsocksR Admin Panel');
+?>
+EOL
+
 # تنظیم کرون‌جاب برای به‌روزرسانی ترافیک
 echo "Setting up the cron job..."
 (crontab -l ; echo "* * * * * /usr/bin/php /var/www/ssr-admin-panel/update_users_traffic.php") | crontab -
+
+# افزودن مجوز برای کاربر www-data
+echo "Configuring sudoers for www-data..."
+echo "www-data ALL=(ALL) NOPASSWD: /usr/local/bin/ssrrmu.sh" | sudo tee -a /etc/sudoers
 
 # پیام پایانی نصب
 echo "Installation completed. Please visit http://$server_ip:$port to access the panel."
