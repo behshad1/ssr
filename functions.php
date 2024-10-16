@@ -186,8 +186,9 @@ function addUser($username, $port, $traffic) {
         }
 
         // حالا اطلاعات کاربر و لینک را به دیتابیس اضافه می‌کنیم
-        try {
-            $db = new PDO('mysql:host=localhost;dbname=ssrdatabase', 'ssrdatabase', '8sSdmjPi3J3aDSBG');
+   try {
+    // اتصال به دیتابیس با استفاده از اطلاعات از config.php
+            $db = new PDO('mysql:host=' . DB_HOST . ';dbname=' . DB_NAME, DB_USER, DB_PASS);
             $stmt = $db->prepare("INSERT INTO users (username, port, traffic, ssr_link, converted_link) VALUES (:username, :port, :traffic, :ssr_link, :converted_link)");
             $stmt->bindParam(':username', $username);
             $stmt->bindParam(':port', $port);
