@@ -15,9 +15,11 @@
             <li><a href="?page=viewUser">View User Information</a></li>
             <li><a href="?page=addUser">Add User</a></li>
             <li><a href="?page=listUsers">List Users</a></li>
-          <li><a href="?page=viewDatabaseUsers">View Users from Database</a></li> <!-- گزینه جدید -->
+            <li><a href="?page=viewDatabaseUsers">View Users from Database</a></li>
             <li><a href="?page=showDefaultUser">Show Default User</a></li>
-            <li><a href="?page=deleteUser">Delete User</a></li> <!-- گزینه حذف کاربر اضافه شد -->
+            <li><a href="?page=deleteUser">Delete User</a></li>
+            <li><a href="?page=install">Install SSR Script</a></li> <!-- نصب اسکریپت -->
+            <li><a href="?page=uninstall">Uninstall SSR Script</a></li> <!-- حذف اسکریپت -->
         </ul>
     </nav>
 
@@ -63,35 +65,40 @@
             <h1>Default User Information (Port 1000)</h1>
             <pre><?php echo htmlspecialchars($defaultUserInfo); ?></pre>
             <button class="back-button" onclick="window.history.back()">Back</button>
-       <?php elseif ($deleteUserPage): ?>
-    <?php if (!empty($deleteUserMessage)): ?>
-        <h1>Delete User Result</h1>
-        <pre><?php echo htmlspecialchars($deleteUserMessage); ?></pre>
-        
-        <?php
-        // بررسی موفقیت‌آمیز بودن حذف کاربر
-        if (strpos($deleteUserMessage, '[information] 用户删除成功') !== false) {
-            echo '<script>alert("User deleted successfully!");</script>';
-        } else {
-            echo '<script>alert("Failed to delete user. Please check the port and try again.");</script>';
-        }
-        ?>
-        
-        <button class="back-button" onclick="window.history.back()">Back</button>
-    <?php else: ?>
-        <h1>Delete User</h1>
-        <form method="post">
-            <label for="delete_port">Enter User Port to Delete:</label>
-            <input type="text" id="delete_port" name="delete_port" required>
-            <input type="submit" value="Delete User">
-        </form>
-    <?php endif; ?>
-<?php if ($viewDatabaseUsersPage): ?>
-    <h1>User List from Database</h1>
-    <pre><?php echo htmlspecialchars($getDatabaseUsersMessage); ?></pre>
-    <button class="back-button" onclick="window.history.back()">Back</button>
-<?php endif; ?>
-
+        <?php elseif ($deleteUserPage): ?>
+            <?php if (!empty($deleteUserMessage)): ?>
+                <h1>Delete User Result</h1>
+                <pre><?php echo htmlspecialchars($deleteUserMessage); ?></pre>
+                
+                <?php
+                if (strpos($deleteUserMessage, '[information] 用户删除成功') !== false) {
+                    echo '<script>alert("User deleted successfully!");</script>';
+                } else {
+                    echo '<script>alert("Failed to delete user. Please check the port and try again.");</script>';
+                }
+                ?>
+                
+                <button class="back-button" onclick="window.history.back()">Back</button>
+            <?php else: ?>
+                <h1>Delete User</h1>
+                <form method="post">
+                    <label for="delete_port">Enter User Port to Delete:</label>
+                    <input type="text" id="delete_port" name="delete_port" required>
+                    <input type="submit" value="Delete User">
+                </form>
+            <?php endif; ?>
+        <?php elseif ($viewDatabaseUsersPage): ?>
+            <h1>User List from Database</h1>
+            <pre><?php echo htmlspecialchars($getDatabaseUsersMessage); ?></pre>
+            <button class="back-button" onclick="window.history.back()">Back</button>
+        <?php elseif ($installPage): ?>
+            <h1>Install SSR Script</h1>
+            <pre><?php echo htmlspecialchars($installMessage); ?></pre>
+            <button class="back-button" onclick="window.history.back()">Back</button>
+        <?php elseif ($uninstallPage): ?>
+            <h1>Uninstall SSR Script</h1>
+            <pre><?php echo htmlspecialchars($uninstallMessage); ?></pre>
+            <button class="back-button" onclick="window.history.back()">Back</button>
         <?php else: ?>
             <h1>Welcome to Admin Panel</h1>
             <p>Please select an option from the menu.</p>
