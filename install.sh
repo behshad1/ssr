@@ -106,7 +106,7 @@ sudo systemctl restart nginx
 
 # ساخت دیتابیس و جداول
 echo "Setting up the database..."
-mysql -u root -p <<MYSQL_SCRIPT
+mysql -u root -p"$db_password" <<MYSQL_SCRIPT
 CREATE DATABASE IF NOT EXISTS ssrdatabase;
 USE ssrdatabase;
 
@@ -128,9 +128,9 @@ echo "Database and tables created successfully."
 
 # وارد کردن اطلاعات دیتابیس در فایل کانفیگ
 echo "Configuring database settings..."
-sed -i 's/DB_NAME=.*/DB_NAME="ssrdatabase"/' /var/www/ssr-admin-panel/config.php
-sed -i 's/DB_USER=.*/DB_USER="root"/' /var/www/ssr-admin-panel/config.php
-sed -i 's/DB_PASS=.*/DB_PASS="your_mysql_root_password"/' /var/www/ssr-admin-panel/config.php
+sed -i "s/DB_NAME=.*/DB_NAME=\"ssrdatabase\"/" /var/www/ssr-admin-panel/config.php
+sed -i "s/DB_USER=.*/DB_USER=\"root\"/" /var/www/ssr-admin-panel/config.php
+sed -i "s/DB_PASS=.*/DB_PASS=\"$db_password\"/" /var/www/ssr-admin-panel/config.php
 
 # تنظیم کرون‌جاب برای به‌روزرسانی ترافیک
 echo "Setting up the cron job..."
