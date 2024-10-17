@@ -73,8 +73,6 @@ read -p "Please enter the port number to run the panel (default: 8080): " port
 port=${port:-8080}  # اگر کاربر چیزی وارد نکرد، پورت پیش‌فرض 8080 خواهد بود
 echo "Port entered: $port"
 
-# تولید رمز عبور تصادفی
-db_password=$(openssl rand -base64 12)  # تولید یک رمز عبور تصادفی
 
 # تنظیمات Nginx
 echo "Configuring Nginx..."
@@ -107,33 +105,13 @@ sudo ln -sf /etc/nginx/sites-available/ssr-panel /etc/nginx/sites-enabled/
 echo "Restarting Nginx..."
 sudo systemctl restart nginx
 
-# ساخت دیتابیس و جداول
-echo "Setting up the database..."
-mysql -u root -p"$db_password" <<MYSQL_SCRIPT
-CREATE DATABASE IF NOT EXISTS ssrdatabase;
-USE ssrdatabase;
 
-CREATE TABLE IF NOT EXISTS users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(255) NOT NULL,
-    port INT NOT NULL,
-    traffic VARCHAR(255),
-    used_traffic VARCHAR(255),
-    remaining_traffic VARCHAR(255),
-    total_traffic VARCHAR(255),
-    ssr_link TEXT,
-    converted_link TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-MYSQL_SCRIPT
-
-echo "Database and tables created successfully."
 
 # وارد کردن اطلاعات دیتابیس در فایل کانفیگ
 echo "Configuring database settings..."
 sed -i "s/DB_NAME=.*/DB_NAME=\"ssrdatabase\"/" /var/www/ssr-admin-panel/config.php
-sed -i "s/DB_USER=.*/DB_USER=\"root\"/" /var/www/ssr-admin-panel/config.php
-sed -i "s/DB_PASS=.*/DB_PASS=\"$db_password\"/" /var/www/ssr-admin-panel/config.php
+sed -i "s/DB_USER=.*/DB_USER=\"ssruser\"/" /var/www/ssr-admin-panel/config.php
+sed -i "s/DB_PASS=.*/DB_PASS=\"password123\"/" /var/www/ssr-admin-panel/config.php
 
 # تنظیم پسورد دیتابیس در MySQL
 mysql -u root -p -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '$db_password';"
