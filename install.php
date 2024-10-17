@@ -11,7 +11,7 @@ $rootPass = ''; // پسورد روت MySQL را اینجا وارد کنید ی�
 // نام دیتابیس و یوزر جدیدی که می‌خواهید بسازید
 $dbName = 'ssrdatabase';
 $dbUser = 'ssruser'; // نام کاربری یوزر جدید
-$dbPass = 'password123'; // پسورد برای یوزر جدید
+$dbPass = bin2hex(random_bytes(8)); // ایجاد یک پسورد تصادفی برای یوزر جدید
 
 try {
     // اتصال به MySQL به عنوان root
@@ -32,20 +32,18 @@ try {
     $pdo->exec("USE `$dbName`");
 
     // ایجاد جداول مورد نیاز
-    $pdo->exec("
-        CREATE TABLE IF NOT EXISTS users (
-            id INT(11) AUTO_INCREMENT PRIMARY KEY,
-            username VARCHAR(50) NOT NULL,
-            port INT(5) NOT NULL,
-            traffic BIGINT DEFAULT 0,
-            used_traffic BIGINT DEFAULT 0,
-            remaining_traffic BIGINT DEFAULT 0,
-            total_traffic BIGINT DEFAULT 0,
-            ssr_link TEXT,
-            converted_link TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    ");
+    $pdo->exec("CREATE TABLE IF NOT EXISTS users (
+        id INT(11) AUTO_INCREMENT PRIMARY KEY,
+        username VARCHAR(50) NOT NULL,
+        port INT(5) NOT NULL,
+        traffic BIGINT DEFAULT 0,
+        used_traffic BIGINT DEFAULT 0,
+        remaining_traffic BIGINT DEFAULT 0,
+        total_traffic BIGINT DEFAULT 0,
+        ssr_link TEXT,
+        converted_link TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )");
     echo "Table 'users' created successfully.<br>";
 
     // ساخت فایل config.php و ذخیره اطلاعات اتصال به دیتابیس
@@ -57,6 +55,7 @@ try {
     
     file_put_contents('config.php', $configContent);
     echo "Config file created successfully.<br>";
+    echo "Database user password: $dbPass<br>"; // نمایش پسورد برای اطلاع کاربر
 
 } catch (PDOException $e) {
     die("Error: " . $e->getMessage());
