@@ -30,7 +30,8 @@ try {
     echo "User '$dbUser' created and granted privileges.<br>";
 
     // اتصال به دیتابیس ایجاد شده
-    $pdo->exec("USE `$dbName`");
+    $pdo = new PDO("mysql:host=localhost;dbname=$dbName", $dbUser, $dbPass);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     // ایجاد جدول users
     $pdo->exec("CREATE TABLE IF NOT EXISTS users (
