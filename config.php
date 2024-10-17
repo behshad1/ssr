@@ -1,9 +1,9 @@
 <?php
-// اطلاعات دیتابیس
-define('DB_HOST', 'localhost'); // آدرس سرور دیتابیس
+// تنظیمات پایگاه داده
+define('DB_HOST', 'localhost'); // یا IP سرور
 define('DB_NAME', 'ssrdatabase'); // نام دیتابیس
-define('DB_USER', 'ssrdatabase'); // نام کاربری دیتابیس
-define('DB_PASS', 'your_database_password'); // پسورد دیتابیس
+define('DB_USER', 'ssruser'); // نام کاربری دیتابیس
+define('DB_PASS', 'password123'); // رمز عبور دیتابیس
 
 
 
