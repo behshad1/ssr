@@ -73,6 +73,9 @@ read -p "Please enter the port number to run the panel (default: 8080): " port
 port=${port:-8080}  # اگر کاربر چیزی وارد نکرد، پورت پیش‌فرض 8080 خواهد بود
 echo "Port entered: $port"
 
+# تولید رمز عبور تصادفی
+db_password=$(openssl rand -base64 12)  # تولید یک رمز عبور تصادفی
+
 # تنظیمات Nginx
 echo "Configuring Nginx..."
 sudo rm -f /etc/nginx/sites-enabled/ssr-panel  # حذف سیم‌لینک قدیمی اگر وجود دارد
