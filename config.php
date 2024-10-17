@@ -1,12 +1,12 @@
 <?php
-// تنظیمات پایگاه داده
-define('DB_HOST', 'localhost'); // یا IP سرور
-define('DB_NAME', 'ssrdatabase'); // نام دیتابیس
-define('DB_USER', 'ssruser'); // نام کاربری دیتابیس
-define('DB_PASS', 'password123'); // رمز عبور دیتابیس
+// نمایش خطاها برای دیباگ
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-
-
-// سایر تنظیمات عمومی
-define('PANEL_TITLE', 'ShadowsocksR Admin Panel');
+// اطلاعات دیتابیس
+define('DB_HOST', 'localhost');
+define('DB_NAME', 'ssrdatabase');
+define('DB_USER', 'ssruser');
+define('DB_PASS', 'password123');
 ?>
