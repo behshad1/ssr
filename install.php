@@ -6,12 +6,12 @@ error_reporting(E_ALL);
 
 // اطلاعات دیتابیس اصلی MySQL
 $rootUser = 'root'; // این یوزر باید دسترسی ادمین داشته باشد
-$rootPass = ''; // پسورد روت MySQL را اینجا وارد کنید یا بگذارید خالی بماند در صورت استفاده بدون پسورد
+$rootPass = 'newpassword'; // رمز عبور جدید روت که تنظیم کردید
 
 // نام دیتابیس و یوزر جدیدی که می‌خواهید بسازید
 $dbName = 'ssrdatabase';
 $dbUser = 'ssruser'; // نام کاربری یوزر جدید
-$dbPass = 'password123'; // پسورد برای یوزر جدید (مطابقت با install.sh)
+$dbPass = 'password123'; // پسورد برای یوزر جدید
 
 try {
     // اتصال به MySQL به عنوان root
@@ -22,7 +22,7 @@ try {
     $pdo->exec("CREATE DATABASE IF NOT EXISTS `$dbName`");
     echo "Database '$dbName' created successfully.<br>";
 
-    // ساخت یوزر جدید و دادن دسترسی به دیتابیس (اختیاری)
+    // ساخت یوزر جدید و دادن دسترسی به دیتابیس
     $pdo->exec("CREATE USER IF NOT EXISTS '$dbUser'@'localhost' IDENTIFIED BY '$dbPass'");
     $pdo->exec("GRANT ALL PRIVILEGES ON `$dbName`.* TO '$dbUser'@'localhost'");
     $pdo->exec("FLUSH PRIVILEGES");
@@ -53,9 +53,8 @@ try {
     $configContent .= "define('DB_USER', '$dbUser');\n";
     $configContent .= "define('DB_PASS', '$dbPass');\n";
     
-    file_put_contents('config.php', $configContent);
+    file_put_contents('/var/www/ssr-admin-panel/config.php', $configContent);
     echo "Config file created successfully.<br>";
-    echo "Database user password: $dbPass<br>"; // نمایش پسورد برای اطلاع کاربر
 
 } catch (PDOException $e) {
     die("Error: " . $e->getMessage());
