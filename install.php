@@ -15,7 +15,7 @@ $dbPass = 'password123'; // پسورد برای یوزر جدید
 
 try {
     // اتصال به MySQL به عنوان root
-    $pdo = new PDO('mysql:host=localhost', $rootUser, $rootPass);
+    $pdo = new PDO('mysql:host=localhost;dbname=' . DB_NAME, DB_USER, DB_PASS);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     // ایجاد دیتابیس
