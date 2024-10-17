@@ -1,11 +1,10 @@
 <?php
-$rootUser = 'root'; // یوزر روت
-$rootPass = 'newpassword'; // پسورد روت
+// اطلاعات دیتابیس
+define('DB_HOST', 'localhost'); // آدرس سرور دیتابیس
+define('DB_NAME', 'your_database_name'); // نام دیتابیس
+define('DB_USER', 'your_database_user'); // نام کاربری دیتابیس
+define('DB_PASS', 'your_database_password'); // پسورد دیتابیس
 
-// نام دیتابیس و یوزر جدیدی که می‌خواهید بسازید
-$dbName = DB_NAME; // از ثابت DB_NAME استفاده می‌کنیم
-$dbUser = DB_USER; // از ثابت DB_USER استفاده می‌کنیم
-$dbPass = DB_PASS; // از ثابت DB_PASS استفاده می‌کنیم
 
 
 // سایر تنظیمات عمومی
