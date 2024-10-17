@@ -266,25 +266,29 @@ function deleteUser($port) {
 
 
 function getUsersFromDatabase() {
-    $db = new PDO('mysql:host=' . DB_HOST . ';dbname=' . DB_NAME, DB_USER, DB_PASS);
-    $query = "SELECT * FROM users";
-    $stmt = $db->query($query);
-    $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    $userList = "=== Users from Database ===\n\n";
-    $userList .= str_pad("ID", 10) . str_pad("Username", 20) . str_pad("Port", 10) . str_pad("Used Traffic", 20) . str_pad("Remaining Traffic", 20) . str_pad("Total Traffic", 20) . "\n";
-    $userList .= str_repeat("-", 100) . "\n";
-
-    foreach ($users as $user) {
-        $userList .= str_pad((string)($user['id'] ?? 'N/A'), 10) 
-                   . str_pad((string)($user['username'] ?? 'N/A'), 20) 
-                   . str_pad((string)($user['port'] ?? 'N/A'), 10) 
-                   . str_pad((string)($user['used_traffic'] ?? '0'), 20) 
-                   . str_pad((string)($user['remaining_traffic'] ?? '0'), 20) 
-                   . str_pad((string)($user['total_traffic'] ?? '0'), 20) . "\n";
+    try {
+        $db = new PDO('mysql:host=' . DB_HOST . ';dbname=' . DB_NAME, DB_USER, DB_PASS);
+        $query = "SELECT * FROM users";
+        $stmt = $db->query($query);
+        $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        $userList = "=== Users from Database ===\n\n";
+        $userList .= str_pad("ID", 10) . str_pad("Username", 20) . str_pad("Port", 10) . str_pad("Used Traffic", 20) . str_pad("Remaining Traffic", 20) . str_pad("Total Traffic", 20) . "\n";
+        $userList .= str_repeat("-", 100) . "\n";
+        
+        foreach ($users as $user) {
+            $userList .= str_pad((string)($user['id'] ?? 'N/A'), 10) 
+                       . str_pad((string)($user['username'] ?? 'N/A'), 20) 
+                       . str_pad((string)($user['port'] ?? 'N/A'), 10) 
+                       . str_pad((string)($user['used_traffic'] ?? '0'), 20) 
+                       . str_pad((string)($user['remaining_traffic'] ?? '0'), 20) 
+                       . str_pad((string)($user['total_traffic'] ?? '0'), 20) . "\n";
+        }
+        
+        return $userList;
+    } catch (PDOException $e) {
+        return "Database error: " . $e->getMessage();
     }
-
-    return $userList;
 }
 
 function install_SSR() {
