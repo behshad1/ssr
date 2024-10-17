@@ -3,7 +3,6 @@
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
-require_once 'config.php'; // مطمئن شوید که مسیر درست باشد
 
 // اطلاعات دیتابیس اصلی MySQL
 $rootUser = 'root'; // این یوزر باید دسترسی ادمین داشته باشد
@@ -16,21 +15,21 @@ $dbPass = 'password123'; // پسورد برای یوزر جدید
 
 try {
     // اتصال به MySQL به عنوان root
-    $pdo = new PDO('mysql:host=localhost;dbname=' . DB_NAME, DB_USER, DB_PASS);
+    $pdo = new PDO('mysql:host=localhost', $rootUser, $rootPass);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     // ایجاد دیتابیس
     $pdo->exec("CREATE DATABASE IF NOT EXISTS `$dbName`");
     echo "Database '$dbName' created successfully.<br>";
 
+    // انتخاب دیتابیس
+    $pdo->exec("USE `$dbName`");
+
     // ساخت یوزر جدید و دادن دسترسی به دیتابیس
     $pdo->exec("CREATE USER IF NOT EXISTS '$dbUser'@'localhost' IDENTIFIED BY '$dbPass'");
     $pdo->exec("GRANT ALL PRIVILEGES ON `$dbName`.* TO '$dbUser'@'localhost'");
     $pdo->exec("FLUSH PRIVILEGES");
     echo "User '$dbUser' created and granted privileges.<br>";
-
-    // انتخاب دیتابیس
-    $pdo->exec("USE `$dbName`");
 
     // ایجاد جداول مورد نیاز
     $pdo->exec("CREATE TABLE IF NOT EXISTS users (
