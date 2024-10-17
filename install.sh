@@ -135,6 +135,9 @@ sed -i "s/DB_NAME=.*/DB_NAME=\"ssrdatabase\"/" /var/www/ssr-admin-panel/config.p
 sed -i "s/DB_USER=.*/DB_USER=\"root\"/" /var/www/ssr-admin-panel/config.php
 sed -i "s/DB_PASS=.*/DB_PASS=\"$db_password\"/" /var/www/ssr-admin-panel/config.php
 
+# تنظیم پسورد دیتابیس در MySQL
+mysql -u root -p -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '$db_password';"
+
 # تنظیم کرون‌جاب برای به‌روزرسانی ترافیک
 echo "Setting up the cron job..."
 (crontab -l ; echo "* * * * * /usr/bin/php /var/www/ssr-admin-panel/update_users_traffic.php") | crontab -
