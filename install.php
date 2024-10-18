@@ -29,7 +29,7 @@ try {
     $pdo->exec("FLUSH PRIVILEGES");
     echo "User '$dbUser' created and granted privileges.<br>";
 
-    // اتصال به دیتابیس ایجاد شده
+    // اتصال به دیتابیس ایجاد شده با یوزر جدید
     $pdo = new PDO("mysql:host=localhost;dbname=$dbName", $dbUser, $dbPass);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -55,8 +55,11 @@ try {
     $configContent .= "define('DB_USER', '$dbUser');\n";
     $configContent .= "define('DB_PASS', '$dbPass');\n";
     
-    file_put_contents('config.php', $configContent);
-    echo "Config file created successfully.<br>";
+    if (file_put_contents('config.php', $configContent)) {
+        echo "Config file created successfully.<br>";
+    } else {
+        echo "Failed to create config file.<br>";
+    }
 
 } catch (PDOException $e) {
     die("Error: " . $e->getMessage());
