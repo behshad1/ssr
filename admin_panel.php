@@ -6,7 +6,10 @@ error_reporting(E_ALL);
 // نیاز به توابع جداگانه برای عملکرد‌های مختلف
 require_once 'functions.php'; 
 
-// متغیرهای مورد نیاز برای هر صفحه
+// شروع جلسه (session) برای ذخیره اطلاعات کاربر
+session_start();
+
+// متغیرهای مربوط به صفحه‌های مختلف
 $userInfo = '';
 $userList = '';
 $defaultUserInfo = '';
@@ -24,6 +27,14 @@ $installPage = false;
 $uninstallPage = false;
 $getDatabaseUsersMessage = '';
 
+// چک کردن لاگین کاربر
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    // اگر کاربر لاگین نکرده، به صفحه لاگین منتقل شود
+    header("Location: login.php");
+    exit;
+}
+
+// بررسی درخواست‌های POST برای عملکرد‌های مختلف
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['username']) && isset($_POST['port']) && isset($_POST['traffic'])) {
         // گرفتن ورودی‌های فرم افزودن کاربر
