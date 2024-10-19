@@ -131,5 +131,44 @@ echo "Setting up the cron job..."
 echo "Configuring sudoers for www-data..."
 echo "www-data ALL=(ALL) NOPASSWD: /usr/local/bin/ssrrmu.sh" | sudo tee -a /etc/sudoers
 
+# ایجاد جداول در دیتابیس
+echo "Creating tables in the database..."
+mysql -u $DB_USER -p$DB_PASS $DB_NAME <<EOF
+CREATE TABLE IF NOT EXISTS users (
+    id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL,
+    port INT(5) NOT NULL,
+    traffic BIGINT DEFAULT 0,
+    used_traffic BIGINT DEFAULT 0,
+    remaining_traffic BIGINT DEFAULT 0,
+    total_traffic BIGINT DEFAULT 0,
+    ssr_link TEXT,
+    converted_link TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS transactions (
+    id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    user_id INT(11) NOT NULL,
+    amount BIGINT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+CREATE TABLE IF NOT EXISTS configs (
+    id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    setting_name VARCHAR(50) NOT NULL,
+    setting_value TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+EOF
+
+if [ $? -ne 0 ]; then
+    echo "Error: Failed to create tables."
+    exit 1
+fi
+
+echo "Tables created successfully."
+
 # پیام پایانی نصب
 echo "Installation completed. Please visit http://$server_ip:$port to access the panel."
