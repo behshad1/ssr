@@ -3,7 +3,7 @@
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
-
+require_once 'config.php';
 // اطلاعات دیتابیس اصلی MySQL
 $rootUser = 'root'; // این یوزر باید دسترسی ادمین داشته باشد
 $rootPass = 'newpassword'; // رمز عبور جدید روت که تنظیم کردید
