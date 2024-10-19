@@ -32,6 +32,11 @@ if [ -d "/var/www/ssr-admin-panel" ]; then
             ;;
     esac
 fi
+# اطلاعات دیتابیس MySQL
+rootPass="your_mysql_root_password"
+dbName="ssrdatabase"
+dbUser="ssruser"
+dbPass="password123"
 
 # نصب پیش‌نیازها
 echo "Installing dependencies..."
@@ -40,6 +45,14 @@ sudo apt install -y software-properties-common
 sudo add-apt-repository ppa:ondrej/php -y
 sudo apt update
 sudo apt install -y php8.1 php8.1-fpm php8.1-mysql nginx git mysql-server
+
+# اجرای دستورات MySQL برای ساخت دیتابیس و یوزر
+mysql -u root -p"$rootPass" -e "CREATE DATABASE IF NOT EXISTS $dbName;"
+mysql -u root -p"$rootPass" -e "CREATE USER IF NOT EXISTS '$dbUser'@'localhost' IDENTIFIED BY '$dbPass';"
+mysql -u root -p"$rootPass" -e "GRANT ALL PRIVILEGES ON $dbName.* TO '$dbUser'@'localhost';"
+mysql -u root -p"$rootPass" -e "FLUSH PRIVILEGES;"
+
+echo "Database and user created successfully."
 
 # بررسی نصب MySQL
 if ! command -v mysql &> /dev/null; then
