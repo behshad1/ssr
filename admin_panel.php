@@ -27,12 +27,7 @@ $installPage = false;
 $uninstallPage = false;
 $getDatabaseUsersMessage = '';
 
-// چک کردن لاگین کاربر
-if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-    // اگر کاربر لاگین نکرده، به صفحه لاگین منتقل شود
-    header("Location: login.php");
-    exit;
-}
+
 
 // بررسی درخواست‌های POST برای عملکرد‌های مختلف
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
