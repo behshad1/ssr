@@ -1,7 +1,10 @@
 <?php
 session_start();
-include 'config.php';  // فراخوانی فایل config برای استفاده از نام کاربری و رمز عبور ذخیره شده
+include 'config.php';  // نام کاربری و رمز عبور در این فایل ذخیره شده است
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $username = $_POST['username'];
+    $password = $_POST['password'];
 
     // بررسی نام کاربری و رمز عبور
     if ($username === $panel_username && password_verify($password, $panel_password)) {
@@ -19,7 +22,6 @@ if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
     exit;
 }
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
