@@ -6,7 +6,7 @@ error_reporting(E_ALL);
 require_once 'config.php';
 // اطلاعات دیتابیس اصلی MySQL
 $rootUser = 'root'; // این یوزر باید دسترسی ادمین داشته باشد
-$rootPass = 'newpassword'; // رمز عبور جدید روت که تنظیم کردید
+$rootPass = ''; // رمز عبور جدید روت که تنظیم کردید
 
 // نام دیتابیس و یوزر جدیدی که می‌خواهید بسازید
 $dbName = 'ssrdatabase';
