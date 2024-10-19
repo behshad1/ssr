@@ -50,17 +50,7 @@ fi
 # درخواست اطلاعات دیتابیس از کاربر
 read -p "Please enter MySQL root password: " rootpass
 
-# دریافت نام کاربری و رمز عبور برای پنل
-read -p "Please enter the username for the panel: " panel_username
-read -sp "Please enter the password for the panel: " panel_password
-echo ""
 
-# ذخیره نام کاربری و رمز عبور در فایل پیکربندی
-config_file="/var/www/ssr-admin-panel/config.php"
-echo "<?php" > $config_file
-echo "\$panel_username = '$panel_username';" >> $config_file
-echo "\$panel_password = password_hash('$panel_password', PASSWORD_BCRYPT);" >> $config_file
-echo "?>" >> $config_file
 
 # ساخت دیتابیس و کاربر
 echo "Creating database and user..."
