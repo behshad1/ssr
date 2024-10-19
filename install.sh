@@ -50,8 +50,6 @@ fi
 # درخواست اطلاعات دیتابیس از کاربر
 read -p "Please enter MySQL root password: " rootpass
 
-
-
 # ساخت دیتابیس و کاربر
 echo "Creating database and user..."
 mysql -u root -p"$rootpass" -e "CREATE DATABASE IF NOT EXISTS ssrdatabase;"
@@ -73,6 +71,10 @@ sudo chown -R www-data:www-data /var/www/ssr-admin-panel
 echo "Configuring PHP user and group..."
 sudo sed -i "s/^user = .*/user = www-data/" /etc/php/8.1/fpm/pool.d/www.conf
 sudo sed -i "s/^group = .*/group = www-data/" /etc/php/8.1/fpm/pool.d/www.conf
+
+# غیرفعال کردن توابع exec, passthru, system
+echo "Modifying PHP configuration..."
+sudo sed -i "s/^disable_functions = .*/disable_functions = exec,passthru,system,/" /etc/php/8.1/fpm/php.ini
 
 # گرفتن آی‌پی سرور
 server_ip=$(curl -s http://checkip.amazonaws.com)
