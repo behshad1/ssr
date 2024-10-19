@@ -3,7 +3,6 @@
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
-require_once 'config.php';
 
 // اطلاعات دیتابیس اصلی MySQL
 $rootUser = 'root'; // این یوزر باید دسترسی ادمین داشته باشد
@@ -19,7 +18,7 @@ try {
     $pdo = new PDO('mysql:host=localhost', $rootUser, $rootPass);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // ایجاد دیتابیس
+    // ایجاد دیتابیس اگر وجود ندارد
     $pdo->exec("CREATE DATABASE IF NOT EXISTS `$dbName`");
     echo "Database '$dbName' created successfully.<br>";
 
@@ -29,11 +28,11 @@ try {
     $pdo->exec("FLUSH PRIVILEGES");
     echo "User '$dbUser' created and granted privileges.<br>";
 
-    // اتصال به دیتابیس ایجاد شده با یوزر جدید
+    // اتصال به دیتابیس ایجاد شده
     $pdo = new PDO("mysql:host=localhost;dbname=$dbName", $dbUser, $dbPass);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // ایجاد جدول users
+    // ایجاد جدول users اگر وجود ندارد
     $pdo->exec("CREATE TABLE IF NOT EXISTS users (
         id INT(11) AUTO_INCREMENT PRIMARY KEY,
         username VARCHAR(50) NOT NULL,
@@ -55,11 +54,8 @@ try {
     $configContent .= "define('DB_USER', '$dbUser');\n";
     $configContent .= "define('DB_PASS', '$dbPass');\n";
     
-    if (file_put_contents('config.php', $configContent)) {
-        echo "Config file created successfully.<br>";
-    } else {
-        echo "Failed to create config file.<br>";
-    }
+    file_put_contents('config.php', $configContent);
+    echo "Config file created successfully.<br>";
 
 } catch (PDOException $e) {
     die("Error: " . $e->getMessage());
