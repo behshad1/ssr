@@ -47,22 +47,15 @@ if ! command -v mysql &> /dev/null; then
     exit 1
 fi
 
-# ایجاد دیتابیس و کاربر
+# درخواست اطلاعات دیتابیس از کاربر
+read -p "Please enter MySQL root password: " rootpass
+
+# ساخت دیتابیس و کاربر
 echo "Creating database and user..."
-DB_NAME="ssrdatabase"
-DB_USER="ssruser"
-DB_PASS="password123"
-
-# اتصال به MySQL و ایجاد دیتابیس و کاربر
-mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS $DB_NAME; \
-CREATE USER IF NOT EXISTS '$DB_USER'@'localhost' IDENTIFIED BY '$DB_PASS'; \
-GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'localhost'; \
-FLUSH PRIVILEGES;"
-
-if [ $? -ne 0 ]; then
-    echo "Error: Failed to create database or user."
-    exit 1
-fi
+mysql -u root -p"$rootpass" -e "CREATE DATABASE IF NOT EXISTS ssrdatabase;"
+mysql -u root -p"$rootpass" -e "CREATE USER IF NOT EXISTS 'ssruser'@'localhost' IDENTIFIED BY 'password123';"
+mysql -u root -p"$rootpass" -e "GRANT ALL PRIVILEGES ON ssrdatabase.* TO 'ssruser'@'localhost';"
+mysql -u root -p"$rootpass" -e "FLUSH PRIVILEGES;"
 
 echo "Database and user created successfully."
 
@@ -123,17 +116,9 @@ sudo ln -sf /etc/nginx/sites-available/ssr-panel /etc/nginx/sites-enabled/
 echo "Restarting Nginx..."
 sudo systemctl restart nginx
 
-# تنظیم کرون‌جاب برای به‌روزرسانی ترافیک
-echo "Setting up the cron job..."
-(crontab -l ; echo "* * * * * /usr/bin/php /var/www/ssr-admin-panel/update_users_traffic.php") | crontab -
-
-# افزودن مجوز برای کاربر www-data
-echo "Configuring sudoers for www-data..."
-echo "www-data ALL=(ALL) NOPASSWD: /usr/local/bin/ssrrmu.sh" | sudo tee -a /etc/sudoers
-
-# ایجاد جداول در دیتابیس
-echo "Creating tables in the database..."
-mysql -u $DB_USER -p$DB_PASS $DB_NAME <<EOF
+# ایجاد جدول users
+echo "Creating users table..."
+mysql -u ssruser -p'password123' -D ssrdatabase -e "
 CREATE TABLE IF NOT EXISTS users (
     id INT(11) AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL,
@@ -146,29 +131,15 @@ CREATE TABLE IF NOT EXISTS users (
     converted_link TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+"
 
-CREATE TABLE IF NOT EXISTS transactions (
-    id INT(11) AUTO_INCREMENT PRIMARY KEY,
-    user_id INT(11) NOT NULL,
-    amount BIGINT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id)
-);
+# تنظیم کرون‌جاب برای به‌روزرسانی ترافیک
+echo "Setting up the cron job..."
+(crontab -l ; echo "* * * * * /usr/bin/php /var/www/ssr-admin-panel/update_users_traffic.php") | crontab -
 
-CREATE TABLE IF NOT EXISTS configs (
-    id INT(11) AUTO_INCREMENT PRIMARY KEY,
-    setting_name VARCHAR(50) NOT NULL,
-    setting_value TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-EOF
-
-if [ $? -ne 0 ]; then
-    echo "Error: Failed to create tables."
-    exit 1
-fi
-
-echo "Tables created successfully."
+# افزودن مجوز برای کاربر www-data
+echo "Configuring sudoers for www-data..."
+echo "www-data ALL=(ALL) NOPASSWD: /usr/local/bin/ssrrmu.sh" | sudo tee -a /etc/sudoers
 
 # پیام پایانی نصب
 echo "Installation completed. Please visit http://$server_ip:$port to access the panel."
