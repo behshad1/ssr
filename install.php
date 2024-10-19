@@ -19,7 +19,7 @@ try {
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     // ایجاد دیتابیس اگر وجود ندارد
-    $pdo->exec("CREATE DATABASE IF NOT EXISTS `$dbName`");
+    $pdo->exec("CREATE DATABASE IF NOT EXISTS `$dbName` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
     echo "Database '$dbName' created successfully.<br>";
 
     // ساخت یوزر جدید و دادن دسترسی به دیتابیس
@@ -28,7 +28,7 @@ try {
     $pdo->exec("FLUSH PRIVILEGES");
     echo "User '$dbUser' created and granted privileges.<br>";
 
-    // اتصال به دیتابیس ایجاد شده
+    // اتصال به دیتابیس ایجاد شده با یوزر جدید
     $pdo = new PDO("mysql:host=localhost;dbname=$dbName", $dbUser, $dbPass);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
