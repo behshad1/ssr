@@ -19,21 +19,39 @@ try {
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     // ایجاد دیتابیس اگر وجود ندارد
-    $pdo->exec("CREATE DATABASE IF NOT EXISTS `$dbName` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+    $sql = "CREATE DATABASE IF NOT EXISTS `$dbName` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci";
+    $pdo->exec($sql);
     echo "Database '$dbName' created successfully.<br>";
 
+    // بررسی اینکه آیا دیتابیس واقعاً ایجاد شده است
+    $result = $pdo->query("SHOW DATABASES LIKE '$dbName'");
+    if (!$result->fetch()) {
+        throw new Exception("Database '$dbName' was not created.");
+    }
+
     // ساخت یوزر جدید و دادن دسترسی به دیتابیس
-    $pdo->exec("CREATE USER IF NOT EXISTS '$dbUser'@'localhost' IDENTIFIED BY '$dbPass'");
-    $pdo->exec("GRANT ALL PRIVILEGES ON `$dbName`.* TO '$dbUser'@'localhost'");
+    $sqlUser = "CREATE USER IF NOT EXISTS '$dbUser'@'localhost' IDENTIFIED BY '$dbPass'";
+    $pdo->exec($sqlUser);
+    echo "User '$dbUser' created successfully.<br>";
+
+    // بررسی اینکه آیا یوزر ایجاد شده است
+    $resultUser = $pdo->query("SELECT User FROM mysql.user WHERE User = '$dbUser'");
+    if (!$resultUser->fetch()) {
+        throw new Exception("User '$dbUser' was not created.");
+    }
+
+    // اعطای دسترسی به یوزر جدید برای دیتابیس
+    $sqlGrant = "GRANT ALL PRIVILEGES ON `$dbName`.* TO '$dbUser'@'localhost'";
+    $pdo->exec($sqlGrant);
     $pdo->exec("FLUSH PRIVILEGES");
-    echo "User '$dbUser' created and granted privileges.<br>";
+    echo "Privileges granted to '$dbUser' for '$dbName'.<br>";
 
     // اتصال به دیتابیس ایجاد شده با یوزر جدید
     $pdo = new PDO("mysql:host=localhost;dbname=$dbName", $dbUser, $dbPass);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     // ایجاد جدول users اگر وجود ندارد
-    $pdo->exec("CREATE TABLE IF NOT EXISTS users (
+    $sqlTable = "CREATE TABLE IF NOT EXISTS users (
         id INT(11) AUTO_INCREMENT PRIMARY KEY,
         username VARCHAR(50) NOT NULL,
         port INT(5) NOT NULL,
@@ -44,7 +62,8 @@ try {
         ssr_link TEXT,
         converted_link TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )");
+    )";
+    $pdo->exec($sqlTable);
     echo "Table 'users' created successfully.<br>";
 
     // ساخت فایل config.php و ذخیره اطلاعات اتصال به دیتابیس
@@ -58,6 +77,8 @@ try {
     echo "Config file created successfully.<br>";
 
 } catch (PDOException $e) {
+    die("PDO Error: " . $e->getMessage());
+} catch (Exception $e) {
     die("Error: " . $e->getMessage());
 }
 ?>
