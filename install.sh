@@ -41,45 +41,34 @@ sudo add-apt-repository ppa:ondrej/php -y
 sudo apt update
 sudo apt install -y php8.1 php8.1-fpm php8.1-mysql nginx git mysql-server
 
-# ایجاد دیتابیس و کاربر
-echo "Creating database and user..."
-DB_NAME="ssrdatabase"
-DB_USER="ssruser"
-DB_PASS="password123"
-
-# دستور SQL برای ایجاد دیتابیس و کاربر
-sudo mysql -e "CREATE DATABASE IF NOT EXISTS $DB_NAME;"
-sudo mysql -e "CREATE USER IF NOT EXISTS '$DB_USER'@'localhost' IDENTIFIED BY '$DB_PASS';"
-sudo mysql -e "GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'localhost';"
-sudo mysql -e "FLUSH PRIVILEGES;"
-
 # بررسی نصب MySQL
 if ! command -v mysql &> /dev/null; then
     echo "Error: MySQL installation failed or MySQL is not installed correctly."
     exit 1
 fi
 
+# ایجاد دیتابیس و کاربر
+echo "Creating database and user..."
+DB_NAME="ssrdatabase"
+DB_USER="ssruser"
+DB_PASS="password123"
+
+# اتصال به MySQL و ایجاد دیتابیس و کاربر
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS $DB_NAME; \
+CREATE USER IF NOT EXISTS '$DB_USER'@'localhost' IDENTIFIED BY '$DB_PASS'; \
+GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'localhost'; \
+FLUSH PRIVILEGES;"
+
+if [ $? -ne 0 ]; then
+    echo "Error: Failed to create database or user."
+    exit 1
+fi
+
+echo "Database and user created successfully."
+
 # کلون کردن پروژه از گیت‌هاب
 echo "Cloning the project from GitHub..."
 git clone https://github.com/behshad1/ssr.git /var/www/ssr-admin-panel
-
-# ایجاد جدول users
-echo "Creating users table..."
-TABLE_SQL="CREATE TABLE IF NOT EXISTS users (
-        id INT(11) AUTO_INCREMENT PRIMARY KEY,
-        username VARCHAR(50) NOT NULL,
-        port INT(5) NOT NULL,
-        traffic BIGINT DEFAULT 0,
-        used_traffic BIGINT DEFAULT 0,
-        remaining_traffic BIGINT DEFAULT 0,
-        total_traffic BIGINT DEFAULT 0,
-        ssr_link TEXT,
-        converted_link TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );"
-
-# اجرای دستور SQL برای ایجاد جدول
-sudo mysql -u $DB_USER -p$DB_PASS $DB_NAME -e "$TABLE_SQL"
 
 # تنظیم پرمیشن‌ها برای Nginx
 echo "Setting up permissions..."
