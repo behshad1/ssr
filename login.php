@@ -2,9 +2,7 @@
 session_start();
 include 'config.php';  // فراخوانی فایل config برای استفاده از نام کاربری و رمز عبور ذخیره شده
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $panel_username = 'admin';
-$panel_password = 'admin123';  // بدون هش برای تست
+
     // بررسی نام کاربری و رمز عبور
     if ($username === $panel_username && password_verify($password, $panel_password)) {
         $_SESSION['loggedin'] = true;
