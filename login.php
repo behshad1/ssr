@@ -1,50 +1,45 @@
 <?php
 session_start();
-require_once 'functions.php'; // فایل توابع برای مدیریت اعتبارسنجی کاربر
-include 'includes/db.php'; // برای اتصال به دیتابیس
-// بررسی اگر کاربر قبلاً لاگین کرده باشد
-if (isset($_SESSION['user_id'])) {
-    header('Location: admin_panel.php');
-    exit;
-}
+include 'config.php';  // نام کاربری و رمز عبور در این فایل ذخیره شده است
 
-// بررسی درخواست لاگین
-$message = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    // تابع بررسی اعتبار کاربر
-    if (checkUserCredentials($username, $password)) {
-        // در صورت صحیح بودن اعتبار، ذخیره اطلاعات در سشن
-        $_SESSION['user_id'] = $username; // به‌طور مثال می‌توان نام کاربری را در سشن ذخیره کرد
-        header('Location: admin_panel.php');
+    // بررسی نام کاربری و رمز عبور
+    if ($username === $panel_username && password_verify($password, $panel_password)) {
+        $_SESSION['loggedin'] = true;
+        header("Location: admin_panel.php");
         exit;
     } else {
-        $message = 'نام کاربری یا رمز عبور اشتباه است.';
+        $error = "Invalid username or password.";
     }
+}
+
+// اگر کاربر وارد شده باشد، به پنل هدایت می‌شود
+if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
+    header("Location: admin_panel.php");
+    exit;
 }
 ?>
 
 <!DOCTYPE html>
-<html lang="fa">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ورود به پنل مدیریت</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login to SSR Admin Panel</title>
 </head>
 <body>
-    <h2>ورود به پنل مدیریت</h2>
-    <?php if ($message): ?>
-        <p style="color: red;"><?php echo $message; ?></p>
-    <?php endif; ?>
-    <form method="POST" action="login.php">
-        <label for="username">نام کاربری:</label>
-        <input type="text" id="username" name="username" required><br>
-
-        <label for="password">رمز عبور:</label>
-        <input type="password" id="password" name="password" required><br>
-
-        <button type="submit">ورود</button>
+    <h2>Login to SSR Admin Panel</h2>
+    <form method="post" action="">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required><br><br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br><br>
+        <input type="submit" value="Login">
     </form>
+
+    <?php if (isset($error)) { echo "<p style='color:red;'>$error</p>"; } ?>
 </body>
 </html>
