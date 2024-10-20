@@ -264,6 +264,22 @@ function deleteUser($port) {
     }
 }
 
+// تابع برای تبدیل بایت به واحدهای خوانا (B, KB, MB, GB, TB)
+function formatBytes($bytes) {
+    if ($bytes >= 1099511627776) {
+        $bytes = number_format($bytes / 1099511627776, 2) . ' TB';
+    } elseif ($bytes >= 1073741824) {
+        $bytes = number_format($bytes / 1073741824, 2) . ' GB';
+    } elseif ($bytes >= 1048576) {
+        $bytes = number_format($bytes / 1048576, 2) . ' MB';
+    } elseif ($bytes >= 1024) {
+        $bytes = number_format($bytes / 1024, 2) . ' KB';
+    } else {
+        $bytes = $bytes . ' B';
+    }
+
+    return $bytes;
+}
 
 function getUsersFromDatabase() {
     try {
@@ -280,9 +296,9 @@ function getUsersFromDatabase() {
             $userList .= str_pad((string)($user['id'] ?? 'N/A'), 10) 
                        . str_pad((string)($user['username'] ?? 'N/A'), 20) 
                        . str_pad((string)($user['port'] ?? 'N/A'), 10) 
-                       . str_pad((string)($user['used_traffic'] ?? '0'), 20) 
-                       . str_pad((string)($user['remaining_traffic'] ?? '0'), 20) 
-                       . str_pad((string)($user['total_traffic'] ?? '0'), 20) . "\n";
+                       . str_pad(formatBytes((float)($user['used_traffic'] ?? 0)), 20) 
+                       . str_pad(formatBytes((float)($user['remaining_traffic'] ?? 0)), 20) 
+                       . str_pad(formatBytes((float)($user['total_traffic'] ?? 0)), 20) . "\n";
         }
         
         return $userList;
