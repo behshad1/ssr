@@ -2,7 +2,7 @@
 
 // اتصال به دیتابیس با استفاده از PDO
 try {
-    $db = new PDO('mysql:host=localhost;dbname=ssrdatabase', 'ssrdatabase', '8sSdmjPi3J3aDSBG');
+   $db = new PDO('mysql:host=' . DB_HOST . ';dbname=' . DB_NAME, DB_USER, DB_PASS);
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
     die("Database connection failed: " . $e->getMessage());
