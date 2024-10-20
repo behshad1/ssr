@@ -1,8 +1,9 @@
 <?php
 require_once '/var/www/ssr-admin-panel/config.php';
+
 // اتصال به دیتابیس با استفاده از PDO
 try {
-   $db = new PDO('mysql:host=' . DB_HOST . ';dbname=' . DB_NAME, DB_USER, DB_PASS);
+    $db = new PDO('mysql:host=' . DB_HOST . ';dbname=' . DB_NAME, DB_USER, DB_PASS);
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
     die("Database connection failed: " . $e->getMessage());
@@ -11,6 +12,24 @@ try {
 // تابع برای پاک کردن کدهای ANSI
 function stripAnsiCodes($text) {
     return preg_replace('/\x1B\[[0-?]*[ -\/]*[@-~]/', '', $text);
+}
+
+// تابع برای تبدیل واحد ترافیک به بایت‌ها
+function convertTrafficToBytes($traffic) {
+    $units = array('B' => 1, 'KB' => 1024, 'MB' => 1048576, 'GB' => 1073741824, 'TB' => 1099511627776);
+
+    // جدا کردن مقدار و واحد
+    preg_match('/([\d.]+)\s*([KMGT]?B)/i', $traffic, $matches);
+    if (count($matches) == 3) {
+        $value = (float) $matches[1]; // مقدار عددی
+        $unit = strtoupper($matches[2]); // واحد (B, KB, MB, ...)
+
+        // تبدیل به بایت‌ها
+        if (isset($units[$unit])) {
+            return $value * $units[$unit];
+        }
+    }
+    return 0; // اگر تطابقی پیدا نشد، مقدار صفر بازگردانده شود
 }
 
 // تابع برای به‌روزرسانی اطلاعات ترافیک کاربران
@@ -31,34 +50,15 @@ function updateUsersTraffic($db) {
     // پردازش خروجی برای استخراج اطلاعات کاربران
     $lines = explode("\n", $cleanOutput);
 
-// تابع برای تبدیل واحد ترافیک به بایت‌ها
-function convertTrafficToBytes($traffic) {
-    $units = array('B' => 1, 'KB' => 1024, 'MB' => 1048576, 'GB' => 1073741824, 'TB' => 1099511627776);
-
-    // جدا کردن مقدار و واحد
-    preg_match('/([\d.]+)\s*([KMGT]?B)/i', $traffic, $matches);
-    if (count($matches) == 3) {
-        $value = (float) $matches[1]; // مقدار عددی
-        $unit = strtoupper($matches[2]); // واحد (B, KB, MB, ...)
-
-        // تبدیل به بایت‌ها
-        if (isset($units[$unit])) {
-            return $value * $units[$unit];
-        }
-    }
-    return 0; // اگر تطابقی پیدا نشد، مقدار صفر بازگردانده شود
-}
-
-
     foreach ($lines as $line) {
         if (strpos($line, 'Username:') !== false) {
             preg_match('/Username: (.*?) Port: (\d+) Traffic usage \(used \+ remaining = total\): (.*?) \+ (.*?) = (.*)/', $line, $matches);
             if (count($matches) == 6) {
                 $username = $matches[1];
                 $port = $matches[2];
-                $usedTraffic = $matches[3];
-                $remainingTraffic = $matches[4];
-                $totalTraffic = $matches[5];
+                $usedTraffic = convertTrafficToBytes($matches[3]);        // تبدیل به بایت
+                $remainingTraffic = convertTrafficToBytes($matches[4]);   // تبدیل به بایت
+                $totalTraffic = convertTrafficToBytes($matches[5]);       // تبدیل به بایت
 
                 // به‌روزرسانی اطلاعات در دیتابیس
                 $stmt = $db->prepare("UPDATE users SET used_traffic = :usedTraffic, remaining_traffic = :remainingTraffic, total_traffic = :totalTraffic WHERE port = :port");
