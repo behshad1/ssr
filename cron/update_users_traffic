@@ -31,6 +31,25 @@ function updateUsersTraffic($db) {
     // پردازش خروجی برای استخراج اطلاعات کاربران
     $lines = explode("\n", $cleanOutput);
 
+// تابع برای تبدیل واحد ترافیک به بایت‌ها
+function convertTrafficToBytes($traffic) {
+    $units = array('B' => 1, 'KB' => 1024, 'MB' => 1048576, 'GB' => 1073741824, 'TB' => 1099511627776);
+
+    // جدا کردن مقدار و واحد
+    preg_match('/([\d.]+)\s*([KMGT]?B)/i', $traffic, $matches);
+    if (count($matches) == 3) {
+        $value = (float) $matches[1]; // مقدار عددی
+        $unit = strtoupper($matches[2]); // واحد (B, KB, MB, ...)
+
+        // تبدیل به بایت‌ها
+        if (isset($units[$unit])) {
+            return $value * $units[$unit];
+        }
+    }
+    return 0; // اگر تطابقی پیدا نشد، مقدار صفر بازگردانده شود
+}
+
+
     foreach ($lines as $line) {
         if (strpos($line, 'Username:') !== false) {
             preg_match('/Username: (.*?) Port: (\d+) Traffic usage \(used \+ remaining = total\): (.*?) \+ (.*?) = (.*)/', $line, $matches);
