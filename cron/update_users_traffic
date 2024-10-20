@@ -14,22 +14,21 @@ function stripAnsiCodes($text) {
     return preg_replace('/\x1B\[[0-?]*[ -\/]*[@-~]/', '', $text);
 }
 
-// تابع برای تبدیل واحد ترافیک به بایت‌ها
-function convertTrafficToBytes($traffic) {
-    $units = array('B' => 1, 'KB' => 1024, 'MB' => 1048576, 'GB' => 1073741824, 'TB' => 1099511627776);
-
-    // جدا کردن مقدار و واحد
-    preg_match('/([\d.]+)\s*([KMGT]?B)/i', $traffic, $matches);
-    if (count($matches) == 3) {
-        $value = (float) $matches[1]; // مقدار عددی
-        $unit = strtoupper($matches[2]); // واحد (B, KB, MB, ...)
-
-        // تبدیل به بایت‌ها
-        if (isset($units[$unit])) {
-            return $value * $units[$unit];
-        }
+// تابع برای تبدیل بایت به واحدهای خوانا (B, KB, MB, GB, TB)
+function formatBytes($bytes) {
+    if ($bytes >= 1099511627776) {
+        $bytes = number_format($bytes / 1099511627776, 2) . ' TB';
+    } elseif ($bytes >= 1073741824) {
+        $bytes = number_format($bytes / 1073741824, 2) . ' GB';
+    } elseif ($bytes >= 1048576) {
+        $bytes = number_format($bytes / 1048576, 2) . ' MB';
+    } elseif ($bytes >= 1024) {
+        $bytes = number_format($bytes / 1024, 2) . ' KB';
+    } else {
+        $bytes = $bytes . ' B';
     }
-    return 0; // اگر تطابقی پیدا نشد، مقدار صفر بازگردانده شود
+
+    return $bytes;
 }
 
 // تابع برای به‌روزرسانی اطلاعات ترافیک کاربران
@@ -50,34 +49,45 @@ function updateUsersTraffic($db) {
     // پردازش خروجی برای استخراج اطلاعات کاربران
     $lines = explode("\n", $cleanOutput);
 
+    // نمایش عنوان جدول
+    echo str_pad("Username", 20) . str_pad("Port", 10) . str_pad("Used Traffic", 20) . str_pad("Remaining Traffic", 20) . str_pad("Total Traffic", 20) . "\n";
+    echo str_repeat("-", 100) . "\n";
+
     foreach ($lines as $line) {
         if (strpos($line, 'Username:') !== false) {
             preg_match('/Username: (.*?) Port: (\d+) Traffic usage \(used \+ remaining = total\): (.*?) \+ (.*?) = (.*)/', $line, $matches);
             if (count($matches) == 6) {
                 $username = $matches[1];
                 $port = $matches[2];
-                $usedTraffic = convertTrafficToBytes($matches[3]);        // تبدیل به بایت
-                $remainingTraffic = convertTrafficToBytes($matches[4]);   // تبدیل به بایت
-                $totalTraffic = convertTrafficToBytes($matches[5]);       // تبدیل به بایت
+                $usedTraffic = convertTrafficToBytes($matches[3]);
+                $remainingTraffic = convertTrafficToBytes($matches[4]);
+                $totalTraffic = convertTrafficToBytes($matches[5]);
 
-                // به‌روزرسانی اطلاعات در دیتابیس
-                $stmt = $db->prepare("UPDATE users SET used_traffic = :usedTraffic, remaining_traffic = :remainingTraffic, total_traffic = :totalTraffic WHERE port = :port");
-                $stmt->bindParam(':usedTraffic', $usedTraffic);
-                $stmt->bindParam(':remainingTraffic', $remainingTraffic);
-                $stmt->bindParam(':totalTraffic', $totalTraffic);
-                $stmt->bindParam(':port', $port);
-
-                if ($stmt->execute()) {
-                    echo "Updated user: $username (Port: $port)\n";
-                } else {
-                    error_log("Failed to update user: $username (Port: $port)");
-                }
+                // فرمت کردن خروجی جدول
+                echo str_pad($username, 20) . str_pad($port, 10) . str_pad($usedTraffic, 20) . str_pad($remainingTraffic, 20) . str_pad($totalTraffic, 20) . "\n";
             }
         }
     }
 }
 
+// تابع برای تبدیل ترافیک به بایت‌ها
+function convertTrafficToBytes($traffic) {
+    $units = array('B' => 1, 'KB' => 1024, 'MB' => 1048576, 'GB' => 1073741824, 'TB' => 1099511627776);
+
+    // جدا کردن مقدار و واحد
+    preg_match('/([\d.]+)\s*([KMGT]?B)/i', $traffic, $matches);
+    if (count($matches) == 3) {
+        $value = (float) $matches[1]; // مقدار عددی
+        $unit = strtoupper($matches[2]); // واحد (B, KB, MB, ...)
+
+        // تبدیل به بایت‌ها
+        if (isset($units[$unit])) {
+            return $value * $units[$unit];
+        }
+    }
+    return 0; // اگر تطابقی پیدا نشد، مقدار صفر بازگردانده شود
+}
+
 // اجرای به‌روزرسانی
 updateUsersTraffic($db);
-
 ?>
