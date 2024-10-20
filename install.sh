@@ -133,9 +133,10 @@ CREATE TABLE IF NOT EXISTS users (
 );
 "
 
-# تنظیم کرون‌جاب برای به‌روزرسانی ترافیک
-echo "Setting up the cron job..."
+# تنظیم کرون‌جاب برای به‌روزرسانی ترافیک هر دقیقه
+echo "Setting up the cron job to update user traffic every minute..."
 (crontab -l ; echo "* * * * * /usr/bin/php /var/www/ssr-admin-panel/cron/update_users_traffic.php") | crontab -
+
 
 # افزودن مجوز برای کاربر www-data
 echo "Configuring sudoers for www-data..."
