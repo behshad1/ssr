@@ -133,6 +133,17 @@ CREATE TABLE IF NOT EXISTS users (
 );
 "
 
+# ایجاد جدول admin_users برای ذخیره اطلاعات ادمین‌ها
+echo "Creating admin_users table..."
+mysql -u ssruser -p'password123' -D ssrdatabase -e "
+CREATE TABLE IF NOT EXISTS admin_users (
+    id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+"
+
 # تنظیم کرون‌جاب برای به‌روزرسانی ترافیک هر دقیقه
 echo "Setting up the cron job to update user traffic every minute..."
 (crontab -l ; echo "* * * * * /usr/bin/php /var/www/ssr-admin-panel/cron/update_users_traffic.php") | crontab -
@@ -141,6 +152,25 @@ echo "Setting up the cron job to update user traffic every minute..."
 # افزودن مجوز برای کاربر www-data
 echo "Configuring sudoers for www-data..."
 echo "www-data ALL=(ALL) NOPASSWD: /usr/local/bin/ssrrmu.sh" | sudo tee -a /etc/sudoers
+
+# ایجاد نام کاربری و رمز عبور برای پنل
+echo "Setting up admin panel user..."
+
+# درخواست نام کاربری و رمز عبور از کاربر
+read -p "Please enter the admin username: " admin_username
+read -sp "Please enter the admin password: " admin_password  # -s برای پنهان کردن ورودی رمز عبور
+echo  # برای رفتن به خط بعد بعد از وارد کردن رمز عبور
+
+# هش کردن رمز عبور با استفاده از PASSWORD() تابع MySQL (می‌توانید از SHA2() یا هر تابع دیگری استفاده کنید)
+hashed_password=$(mysql -u root -p"$rootpass" -sN -e "SELECT PASSWORD('$admin_password');")
+
+# وارد کردن کاربر جدید به جدول admin_users
+mysql -u ssruser -p'password123' -D ssrdatabase -e "
+INSERT INTO admin_users (username, password)
+VALUES ('$admin_username', '$hashed_password');
+"
+
+echo "Admin user $admin_username created successfully."
 
 # پیام پایانی نصب
 echo "Installation completed. Please visit http://$server_ip:$port to access the panel."
