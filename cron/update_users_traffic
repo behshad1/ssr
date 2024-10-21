@@ -25,7 +25,7 @@ function formatBytes($bytes) {
     } elseif ($bytes >= 1024) {
         $bytes = number_format($bytes / 1024, 2) . ' KB';
     } else {
-        $bytes = $bytes . ' B';
+        $bytes = number_format($bytes, 2) . ' B';
     }
 
     return $bytes;
@@ -59,9 +59,9 @@ function updateUsersTraffic($db) {
             if (count($matches) == 6) {
                 $username = $matches[1];
                 $port = $matches[2];
-                $usedTraffic = convertTrafficToBytes($matches[3]);
-                $remainingTraffic = convertTrafficToBytes($matches[4]);
-                $totalTraffic = convertTrafficToBytes($matches[5]);
+                $usedTraffic = formatBytes(convertTrafficToBytes($matches[3]));
+                $remainingTraffic = formatBytes(convertTrafficToBytes($matches[4]));
+                $totalTraffic = formatBytes(convertTrafficToBytes($matches[5]));
 
                 // فرمت کردن خروجی جدول
                 echo str_pad($username, 20) . str_pad($port, 10) . str_pad($usedTraffic, 20) . str_pad($remainingTraffic, 20) . str_pad($totalTraffic, 20) . "\n";
