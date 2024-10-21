@@ -53,21 +53,24 @@ if ($result->num_rows > 0) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Admin Panel Login</title>
+    <link rel="stylesheet" type="text/css" href="stylesL.css"> <!-- لینک به فایل CSS -->
 </head>
 <body>
-    <h2>Admin Panel Login</h2>
+    <div class="login-container">
+        <h2>Admin Panel Login</h2>
 
-    <?php if (isset($error)) { echo "<p style='color:red;'>$error</p>"; } ?>
+        <?php if (isset($error)) { echo "<p class='error-message'>$error</p>"; } ?>
 
-    <form method="POST" action="login.php">
-        <label for="username">Username:</label><br>
-        <input type="text" id="username" name="username" required><br><br>
+        <form method="POST" action="login.php">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
 
-        <label for="password">Password:</label><br>
-        <input type="password" id="password" name="password" required><br><br>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
 
-        <input type="submit" value="Login">
-    </form>
+            <input type="submit" value="Login">
+        </form>
+    </div>
 </body>
 </html>
