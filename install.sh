@@ -161,14 +161,15 @@ read -p "Please enter the admin username: " admin_username
 read -sp "Please enter the admin password: " admin_password  # -s برای پنهان کردن ورودی رمز عبور
 echo  # برای رفتن به خط بعد بعد از وارد کردن رمز عبور
 
-# هش کردن رمز عبور با استفاده از PASSWORD() تابع MySQL (می‌توانید از SHA2() یا هر تابع دیگری استفاده کنید)
-hashed_password=$(mysql -u root -p"$rootpass" -sN -e "SELECT PASSWORD('$admin_password');")
+# هش کردن رمز عبور با استفاده از PHP
+hashed_password=$(php -r "echo password_hash('$admin_password', PASSWORD_DEFAULT);")
 
 # وارد کردن کاربر جدید به جدول admin_users
 mysql -u ssruser -p'password123' -D ssrdatabase -e "
 INSERT INTO admin_users (username, password)
 VALUES ('$admin_username', '$hashed_password');
 "
+
 
 echo "Admin user $admin_username created successfully."
 
