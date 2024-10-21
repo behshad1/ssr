@@ -9,6 +9,13 @@ require_once 'functions.php';
 // شروع جلسه (session) برای ذخیره اطلاعات کاربر
 session_start();
 
+// بررسی اینکه آیا کاربر لاگین کرده است یا نه
+if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
+    header("Location: login.php");
+    exit;
+}
+
+
 // متغیرهای مربوط به صفحه‌های مختلف
 $userInfo = '';
 $userList = '';
