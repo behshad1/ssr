@@ -170,12 +170,20 @@ if [ -z "$hashed_password" ]; then
     exit 1
 fi
 
+# فرار دادن رشته‌های متغیرهای username و password برای جلوگیری از خطای SQL
+admin_username=$(printf '%q' "$admin_username")
+hashed_password=$(printf '%q' "$hashed_password")
+
 # وارد کردن کاربر جدید به جدول admin_users
 mysql -u ssruser -p'password123' -D ssrdatabase -e "
 INSERT INTO admin_users (username, password)
 VALUES ('$admin_username', '$hashed_password');
 "
-
+# بررسی خطای MySQL
+if [ $? -ne 0 ]; then
+    echo "Error: Failed to insert the admin user."
+    exit 1
+fi
 
 echo "Admin user $admin_username created successfully."
 
