@@ -20,7 +20,9 @@
             <li><a href="?page=deleteUser">Delete User</a></li>
             <li><a href="?page=install">Install SSR Script</a></li> <!-- نصب اسکریپت -->
             <li><a href="?page=uninstall">Uninstall SSR Script</a></li> <!-- حذف اسکریپت -->
-        </ul>
+                   <li><a href="logout.php">Logout</a></li>
+
+ </ul>
     </nav>
 
     <div class="container">
