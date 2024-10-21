@@ -21,27 +21,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $conn->real_escape_string($_POST['username']);
     $password = $conn->real_escape_string($_POST['password']);
 
-    // دریافت اطلاعات کاربر از دیتابیس
-    $result = $conn->query("SELECT * FROM admin_users WHERE username='$username'");
-    
-    if ($result->num_rows > 0) {
-        $row = $result->fetch_assoc();
-        
-        // بررسی تطابق رمز عبور
-        if (password_verify($password, $row['password'])) {
-            // ایجاد session برای کاربر
-            $_SESSION['admin_logged_in'] = true;
-            $_SESSION['admin_username'] = $username;
+// دریافت اطلاعات کاربر از دیتابیس
+$result = $conn->query("SELECT * FROM admin_users WHERE username='$username'");
 
-            // هدایت به صفحه ادمین
-            header("Location: admin_panel.php");
-            exit;
-        } else {
-            $error = "Invalid password.";
-        }
+if ($result->num_rows > 0) {
+    $row = $result->fetch_assoc();
+    
+    // بررسی تطابق رمز عبور
+    if (password_verify($password, $row['password'])) {
+        // ایجاد session برای کاربر
+        $_SESSION['admin_logged_in'] = true;
+        $_SESSION['admin_username'] = $username;
+
+        // هدایت به صفحه ادمین
+        header("Location: admin_panel.php");
+        exit;
     } else {
-        $error = "Invalid username.";
+        $error = "Invalid password.";
     }
+} else {
+    $error = "Invalid username.";
+}
+
 
     $conn->close();
 }
