@@ -55,19 +55,23 @@ if ($result->num_rows > 0) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel Login</title>
     <link rel="stylesheet" type="text/css" href="stylesL.css"> <!-- لینک به فایل CSS -->
+    <script defer src="script.js"></script> <!-- لینک به فایل جاوا اسکریپت -->
 </head>
 <body>
     <div class="login-container">
         <h2>Admin Panel Login</h2>
 
-        <?php if (isset($error)) { echo "<p class='error-message'>$error</p>"; } ?>
+        <p id="error-message" class="error-message" style="display:none;"></p>
 
-        <form method="POST" action="login.php">
+        <form id="login-form" method="POST" action="login.php" onsubmit="return validateForm()">
             <label for="username">Username:</label>
             <input type="text" id="username" name="username" required>
 
             <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
+            <div class="password-container">
+                <input type="password" id="password" name="password" required>
+                <button type="button" id="toggle-password">Show</button> <!-- دکمه نمایش رمز عبور -->
+            </div>
 
             <input type="submit" value="Login">
         </form>
