@@ -164,6 +164,12 @@ echo  # برای رفتن به خط بعد بعد از وارد کردن رمز 
 # هش کردن رمز عبور با استفاده از PHP
 hashed_password=$(php -r "echo password_hash('$admin_password', PASSWORD_DEFAULT);")
 
+# بررسی خطای احتمالی در تولید هش
+if [ -z "$hashed_password" ]; then
+    echo "Error: Unable to hash the password."
+    exit 1
+fi
+
 # وارد کردن کاربر جدید به جدول admin_users
 mysql -u ssruser -p'password123' -D ssrdatabase -e "
 INSERT INTO admin_users (username, password)
