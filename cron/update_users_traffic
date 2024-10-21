@@ -59,12 +59,27 @@ function updateUsersTraffic($db) {
             if (count($matches) == 6) {
                 $username = $matches[1];
                 $port = $matches[2];
-                $usedTraffic = formatBytes(convertTrafficToBytes($matches[3]));
-                $remainingTraffic = formatBytes(convertTrafficToBytes($matches[4]));
-                $totalTraffic = formatBytes(convertTrafficToBytes($matches[5]));
+                $usedTraffic = convertTrafficToBytes($matches[3]);
+                $remainingTraffic = convertTrafficToBytes($matches[4]);
+                $totalTraffic = convertTrafficToBytes($matches[5]);
 
                 // فرمت کردن خروجی جدول
-                echo str_pad($username, 20) . str_pad($port, 10) . str_pad($usedTraffic, 20) . str_pad($remainingTraffic, 20) . str_pad($totalTraffic, 20) . "\n";
+                echo str_pad($username, 20) . str_pad($port, 10) . str_pad(formatBytes($usedTraffic), 20) . str_pad(formatBytes($remainingTraffic), 20) . str_pad(formatBytes($totalTraffic), 20) . "\n";
+
+                // به‌روزرسانی دیتابیس
+                $query = "UPDATE users SET used_traffic = :usedTraffic, remaining_traffic = :remainingTraffic, total_traffic = :totalTraffic WHERE port = :port";
+                $stmt = $db->prepare($query);
+                $stmt->execute([
+                    'usedTraffic' => $usedTraffic,
+                    'remainingTraffic' => $remainingTraffic,
+                    'totalTraffic' => $totalTraffic,
+                    'port' => $port
+                ]);
+
+                // اگر خطایی در به‌روزرسانی دیتابیس رخ دهد
+                if (!$stmt) {
+                    error_log("Failed to update traffic for user: " . $username . " on port: " . $port);
+                }
             }
         }
     }
@@ -90,4 +105,3 @@ function convertTrafficToBytes($traffic) {
 
 // اجرای به‌روزرسانی
 updateUsersTraffic($db);
-?>
