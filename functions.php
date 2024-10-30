@@ -197,8 +197,15 @@ function addUser($username, $port, $traffic) {
             $stmt->bindParam(':ssr_link', $ssrLink);
             $stmt->bindParam(':converted_link', $convertedLink); // افزودن bindParam برای converted_link
 
-            if ($stmt->execute()) {
-                return "User added successfully and SSR link stored in the database.";
+           if ($stmt->execute()) {
+        // ساخت پیام موفقیت با جزئیات کاربر
+         return "User added successfully! \n\n" .
+               "Details:\n\n" .  // فاصله بیشتر
+               "Username: `$username`\n\n" .  // نمایش ساده برای username
+               "Port: `$port`\n\n" .          // نمایش ساده برای port
+               "Traffic: `$traffic`\n\n" .    // نمایش ساده برای traffic
+               "SSR Link: `$ssrLink`\n\n" .   // نمایش ساده برای SSR Link
+               "Converted Link: `$convertedLink`"; // نمایش ساده برای Converted Linkk
             } else {
                 return "Failed to add user to database.";
             }
